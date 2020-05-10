@@ -3,6 +3,7 @@ import 'p5/lib/addons/p5.sound'
 import {params} from './params'
 import {chromotome_palettes} from './chromotome';
 import * as chroma from 'chroma.ts';
+import { SmoothLine, RandReal } from './helpers';
 interface Dart {
   x: number;
   y: number;
@@ -27,12 +28,28 @@ var sketch = function (p: p5) {
   var tension_lines: TensionLine[] = [];
   var color_machine;
   var color_palettes = {};
-
+  var gridValues = [];
   p.setup = function () {
     setupColors();
-    setupGraphics()
+    setupGraphics();
+    initGridValues();
+
     console.log('chromotome colors ->',chromotome_palettes)
     throwDart();
+  }
+
+  function initGridValues(){
+    const cell_width = params.canvas.width / params.grid.cols;
+    const cell_height = params.canvas.width / params.grid.rows;
+    for(let i = 0; i < params.grid.cols; i++){
+      for(let j = 0; j < params.grid.rows; j++){
+        gridValues.push({
+          x: i*cell_width + (cell_width / 2),
+          y: i*cell_height + (cell_height / 2)
+        })
+      }
+    }
+    console.log('gridValues->', gridValues)
   }
 
   function setupColors(){
@@ -65,6 +82,8 @@ var sketch = function (p: p5) {
         drawTensionLines();
       p.image(graphic, 0, 0)
       draw_index++;
+      if(draw_index % 10 == 0)
+        incDistRatio();
     }
   }
   
@@ -89,6 +108,8 @@ var sketch = function (p: p5) {
     }
     if(params.draw.outline){
       graphic.strokeWeight(params.tension_line.stroke_weight)
+      const rgba_color = color_machine(cv).rgba()
+      rgba_color[3] = params.tension_line.color_alpha * 255;
       graphic.stroke(rgba_color)
     }else{
       graphic.strokeWeight(0)
@@ -101,45 +122,32 @@ var sketch = function (p: p5) {
       const end_y = darts[t.end_index].y;
       const corner_x = end_x;
       const corner_y = start_y;
-      graphic.beginShape()
-      smooth_line([
+      const line = [
         {x:start_x,y:start_y},
         {x:corner_x,y:corner_y},
         {x:end_x,y:end_y},
-      ],8,0).forEach((v)=>graphic.vertex(v.x,v.y));
+      ];
+      let dr =(params.draw.dart_count % params.draw.smooth_domain) / 
+        (params.draw.smooth_domain)
+      if(params.tension_line.dist_ratio != 0)
+        dr = params.tension_line.dist_ratio;
+      graphic.beginShape()
+      SmoothLine(
+        line,
+        params.tension_line.total_iters,
+        0,
+        dr   
+      ).forEach((v)=>graphic.vertex(v.x,v.y));
       graphic.endShape();
     }
   }
 
-  function smooth_line(line, total_iters, current_iter, dist_ratio = (params.draw.dart_count % params.draw.smooth_domain) / (params.draw.smooth_domain)) {
-    if(total_iters == current_iter)
-      return line;
-    else{
-      let sm_line = []
-      sm_line.push(line[0])
-      for (let i = 0; i < line.length - 1; i++) {
-        let distance = Math.sqrt(Math.pow(line[i + 1].x - line[i].x, 2) + Math.pow(line[i + 1].y - line[i].y, 2))
-        let d = distance * dist_ratio;
-        sm_line.push({
-          x: line[i].x + (d / distance) * (line[i + 1].x - line[i].x),
-          y: line[i].y + (d / distance) * (line[i + 1].y - line[i].y)
-        })
-        d = distance * (1 - dist_ratio);
-        sm_line.push({
-          x: line[i].x + (d / distance) * (line[i + 1].x - line[i].x),
-          y: line[i].y + (d / distance) * (line[i + 1].y - line[i].y)
-        })
-      }
-      sm_line.push(line[line.length - 1])
-      return smooth_line(sm_line, total_iters, current_iter + 1, dist_ratio)
-    }
-  }
-
   function throwDart(){
-    // trimDartboardData()
+    const rand_index = Math.floor(Math.random() * params.grid.cols * params.grid.rows);
+    // console.log(rand_index)
     const dart = {
-      x: genRand(params.dart.radius, params.canvas.width - params.dart.radius),
-      y: genRand(params.dart.radius, params.canvas.height - params.dart.radius),
+      x: gridValues[rand_index].x,
+      y: gridValues[rand_index].y,
       index: darts.length,
       radius: params.dart.radius
     }
@@ -156,35 +164,24 @@ var sketch = function (p: p5) {
     params.draw.dart_count++;
   }
 
-  function trimDartboardData(){
-    if(tension_lines.length > 10)
-      tension_lines = []
-    if(darts.length > 10){
-      darts = [];
-      throwDart();
-    }
-    
-  }
-
-  p.keyPressed = function (event: KeyboardEvent):void{
+  p.keyPressed = function (event: KeyboardEvent):any{
     console.log(event.key)
     switch(event.key){
       case " ": pause = !pause; break;
       case "a": auto_mode = !auto_mode; break;
-      case "d": throwDart() break;
+      case "d": throwDart(); break;
+      case "r": graphic.background(params.color.background); break;
+      case "ArrowRight": incDistRatio(); break;
+      case "ArrowLeft": decDistRatio(); break;
     }
   }
- 
-  var round = (N,acc = 100000) => {
-    return Math.round(N * acc) / acc
-  }
 
-  function genRand(min, max, decimalPlaces = 0) {  
-    var rand = Math.random()*(max-min) + min;
-    var power = Math.pow(10, decimalPlaces);
-    return Math.floor(rand*power) / power;
+  function incDistRatio(){
+    params.tension_line.dist_ratio += params.tension_line.dist_ratio_inc; 
   }
-
+  function decDistRatio(){
+    params.tension_line.dist_ratio -= params.tension_line.dist_ratio_inc; 
+  }
 }
 
 new p5(sketch)
