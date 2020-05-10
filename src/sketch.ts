@@ -82,8 +82,8 @@ var sketch = function (p: p5) {
         drawTensionLines();
       p.image(graphic, 0, 0)
       draw_index++;
-      if(draw_index % 10 == 0)
-        incDistRatio();
+      // if(draw_index % 10 == 0)
+        // incDistRatio();
     }
   }
   
@@ -96,35 +96,44 @@ var sketch = function (p: p5) {
     })
   }
 
-  function drawTensionLines(){
-    // console.log(tension_lines)
+  function setTensionLineColors(){
     const cv = draw_index % params.color.domain / params.color.domain;
-    const rgba_color = color_machine(cv).rgba()
-    rgba_color[3] = params.draw.alpha * 255;
+    const fill_color = color_machine(cv).rgba()
+    fill_color[3] = params.draw.color_alpha * 255;
     if(params.draw.fill){
-      graphic.fill(rgba_color)
+      graphic.fill(fill_color)
     }else{
       graphic.noFill();
     }
-    if(params.draw.outline){
-      graphic.strokeWeight(params.tension_line.stroke_weight)
-      const rgba_color = color_machine(cv).rgba()
-      rgba_color[3] = params.tension_line.color_alpha * 255;
-      graphic.stroke(rgba_color)
-    }else{
-      graphic.strokeWeight(0)
-    }
+    const stroke_color = color_machine(1 - cv).rgba()
+    stroke_color[3] = params.tension_line.color_alpha * 255;
+    // graphic.stroke(params.tension_line.outline_color)
+    graphic.strokeWeight(params.tension_line.stroke_weight)
+    graphic.stroke(params.tension_line.outline_color)
+    // graphic.stroke(stroke_color)
+    console.log(stroke_color)
+  }
+
+
+  function drawTensionLines(){
+    setTensionLineColors();
+    // console.log(tension_lines)
+
     if(tension_lines.length != 0){
       let t = tension_lines[tension_lines.length - 1]
       const start_x = darts[t.start_index].x;
       const start_y = darts[t.start_index].y;
       const end_x = darts[t.end_index].x;
       const end_y = darts[t.end_index].y;
-      const corner_x = end_x;
-      const corner_y = start_y;
+      const corner_xa = end_x
+      const corner_ya = start_y;
+      const corner_xb = start_x
+      const corner_yb = end_y;
+      
       const line = [
         {x:start_x,y:start_y},
-        {x:corner_x,y:corner_y},
+        {x:corner_xa,y:corner_ya},
+        {x:corner_xb,y:corner_yb},
         {x:end_x,y:end_y},
       ];
       let dr =(params.draw.dart_count % params.draw.smooth_domain) / 
@@ -143,11 +152,12 @@ var sketch = function (p: p5) {
   }
 
   function throwDart(){
-    const rand_index = Math.floor(Math.random() * params.grid.cols * params.grid.rows);
+    const rand_index_x = Math.floor(Math.random() * params.grid.cols * params.grid.rows);
+    const rand_index_y = Math.floor(Math.random() * params.grid.cols * params.grid.rows);
     // console.log(rand_index)
     const dart = {
-      x: gridValues[rand_index].x,
-      y: gridValues[rand_index].y,
+      x: gridValues[rand_index_x].x,
+      y: gridValues[rand_index_y].y,
       index: darts.length,
       radius: params.dart.radius
     }

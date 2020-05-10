@@ -1,23 +1,24 @@
 
 export var params = {
   canvas: {
-    width: 4800,
-    height:4800,
+    width: 2400,
+    height:2400,
+    // width: 4800,
+    // height:4800,
   },
 
   draw:{
     darts: false,
     tension_lines: true,
     fill: true,
-    outline: false,
-    alpha: 0.1,
+    color_alpha: 0.3,
     dart_count: 0,
     smooth_domain: 100,
   },
 
   grid:{
-    rows: 4,
-    cols: 4
+    rows: 8,
+    cols: 8
   },
 
   dart:{
@@ -28,21 +29,19 @@ export var params = {
   },
 
   tension_line:{
-    stroke_weight: 1,
-    color: 'white',
+    stroke_weight: 0,
     color_alpha: 0.01,
-    outline_color: '',
+    outline_color: 'white',
     total_iters: 8,
-    dist_ratio: 1,
-    // dist_ratio: 0.97,
-    dist_ratio_inc: -0.001,
+    dist_ratio: 0.25,
+    dist_ratio_inc: -0.05,
   },
 
   color: {
     palette: 'Spectral',
     // palette: 'lemon_citrus',
     // def_palette: 'Spectral',
-    domain: 600,
+    domain: 40,
     background:'black',
   }
 
