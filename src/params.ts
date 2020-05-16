@@ -1,24 +1,26 @@
-
+let len = 4800;
 export var params = {
   canvas: {
-    width: 2400,
-    height:2400,
-    // width: 4800,
-    // height:4800,
+    width: len,
+    height:len,
   },
 
   draw:{
     darts: false,
     tension_lines: true,
     fill: true,
-    color_alpha: 0.3,
+    color_alpha: .3,
+    color_alpha_inc: 0.01,
     dart_count: 0,
     smooth_domain: 100,
+    frame_rate: 30,
   },
 
+  
   grid:{
+    cols: 80,
     rows: 8,
-    cols: 8
+    enabled: false,
   },
 
   dart:{
@@ -29,19 +31,23 @@ export var params = {
   },
 
   tension_line:{
-    stroke_weight: 0,
-    color_alpha: 0.01,
+    stroke_weight: 2,
+    color_alpha: 1,
     outline_color: 'white',
-    total_iters: 8,
-    dist_ratio: 0.25,
-    dist_ratio_inc: -0.05,
+    total_iters: 1,
+    dist_ratio: .25,
+    // dist_ratio: .97,
+    // dist_ratio: 1.05,
+    dist_ratio_inc: 0.01,
   },
 
   color: {
-    palette: 'Spectral',
+    palette: 'RdYlGn',
+    // palette: 'Viridis',
+    // palette: 'Spectral',
     // palette: 'lemon_citrus',
-    // def_palette: 'Spectral',
-    domain: 40,
+    def_palette: 'Spectral',
+    domain: 5,
     background:'black',
   }
 
