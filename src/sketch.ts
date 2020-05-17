@@ -1,58 +1,47 @@
 import * as p5 from 'p5'
 import 'p5/lib/addons/p5.sound'
 import {params} from './params'
-// import {chromotome_palettes} from './chromotome';
 import * as chroma from 'chroma.ts';
-import { SmoothLine, RandReal } from './helpers';
+import { SmoothLine } from './helpers';
 import * as tome from 'chromotome';
-
-interface Dart {
-  x: number;
-  y: number;
-  index: number;
-  radius: number;
-}
-
-interface TensionLine {
-  start_index: number;
-  end_index: number;
-  tension: number;
-}
-
+import { Weave } from './weave';
 
 var sketch = function (p: p5) {
   var pause = false;
-  var auto_mode = false;
+  var jump = false;
+  var auto = false;
   var canvas;
   var graphic;
+  var weave: Weave;
   var draw_index = 0;
-  var grid_index_x: number = 0;
-  var grid_index_y: number = 0;
-  var darts: Dart[] = [];
-  var tension_lines: TensionLine[] = [];
   var color_machine;
+  var success: boolean;
   var color_palettes = {};
-  var gridValues = [];
   p.setup = function () {
     setupColors();
     setupGraphics();
-    initGridValues();
-    throwDart();
+    setupWeave();
   }
 
-  function initGridValues(){
-    const cell_width = params.canvas.width / params.grid.cols;
-    const cell_height = params.canvas.height / params.grid.rows;
-    for(let i = 0; i < params.grid.cols; i++){
-      for(let j = 0; j < params.grid.rows; j++){
-        gridValues.push({
-          x: i*cell_width + (cell_width / 2),
-          y: j*cell_height + (cell_height / 2)
-        })
-      }
-    }
-    console.log('gridValues->', gridValues)
+  function setupWeave(){
+    weave = new Weave(graphic, color_machine);
+    weave.RefreshKnight();
+    weave.RefreshGrid();
   }
+
+  p.draw = function () {
+    if(!pause){
+      if(auto || jump){
+        if(!weave.Jump()){
+          weave.RefreshGrid();
+        }
+        jump = false;
+      }
+      p.image(graphic, 0, 0)
+      draw_index++;
+    }
+  }
+
 
   function setupColors(){
     let chromotome_palettes = tome.getAll();
@@ -62,7 +51,6 @@ var sketch = function (p: p5) {
     }
     color_palettes = { ...color_palettes, ...chroma.brewer };
     console.log('chroma.brewer',chroma.brewer)
-    console.log(color_palettes,params.color.palette,color_palettes[params.color.palette])
     if(params.color.palette in color_palettes)
       color_machine = chroma.scale(color_palettes[params.color.palette]);
     else
@@ -74,6 +62,7 @@ var sketch = function (p: p5) {
     let rand_palette_key = Math.floor(Math.random() * pals.length)
     let new_pal = pals[rand_palette_key]
     color_machine = chroma.scale(new_pal.colors)
+    weave.color_machine = color_machine;
     console.log('new_pal ->', new_pal)
   }
 
@@ -82,22 +71,21 @@ var sketch = function (p: p5) {
     canvas.background(params.color.background)
     graphic = p.createGraphics(params.canvas.width, params.canvas.height)
     // p.frameRate(params.draw.framerate)
-    graphic.frameRate(params.draw.frame_rate)
+    // graphic.frameRate(params.draw.frame_rate)
     graphic.strokeJoin(p.BEVEL)
   }
 
-  p.draw = function () {
-    if(!pause){
-      if(auto_mode)
-        throwDart();
-      if(params.draw.darts)
-        drawDarts();
-      if(params.draw.tension_lines)
-        drawTensionLines();
-      p.image(graphic, 0, 0)
-      draw_index++;
-      // if(draw_index % 10 == 0)
-        // incDistRatio();
+  p.keyPressed = function (event: KeyboardEvent):any{
+    console.log(event.key)
+    switch(event.key){
+      case " ": pause = !pause; break;
+      case "a": auto = !auto; break;
+      case "j": jump = true; break;
+      case "r": graphic.background(params.color.background); break;
+      case "c": randomizeColorMachine(); break;
+      case "ArrowRight": break;
+      case "ArrowLeft": break;
+      // case "0": p.saveFrames("_", "png", 30, 15); break;
     }
   }
   
@@ -201,28 +189,7 @@ var sketch = function (p: p5) {
 
 
 
-  p.keyPressed = function (event: KeyboardEvent):any{
-    console.log(event.key)
-    switch(event.key){
-      case " ": pause = !pause; break;
-      case "a": auto_mode = !auto_mode; break;
-      case "d": throwDart(); break;
-      case "r": graphic.background(params.color.background); break;
-      case "c": randomizeColorMachine(); break;
-      case "ArrowRight": incDistRatio(); break;
-      case "ArrowLeft": decDistRatio(); break;
-      // case "0": p.saveFrames("_", "png", 30, 15); break;
-    }
-  }
 
-  function incDistRatio(){
-    params.tension_line.dist_ratio += params.tension_line.dist_ratio_inc; 
-    console.log(params.tension_line.dist_ratio)
-  }
-  function decDistRatio(){
-    params.tension_line.dist_ratio -= params.tension_line.dist_ratio_inc; 
-    console.log(params.tension_line.dist_ratio)
-  }
 }
 
 new p5(sketch)
