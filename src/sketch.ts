@@ -1,9 +1,7 @@
 import * as p5 from 'p5'
-import 'p5/lib/addons/p5.sound'
-import {params} from './params'
 import * as chroma from 'chroma.ts';
-import { SmoothLine } from './helpers';
 import * as tome from 'chromotome';
+import {params} from './params'
 import { Weave } from './weave';
 
 var sketch = function (p: p5) {
@@ -15,7 +13,6 @@ var sketch = function (p: p5) {
   var weave: Weave;
   var draw_index = 0;
   var color_machine;
-  var success: boolean;
   var color_palettes = {};
   p.setup = function () {
     setupColors();
@@ -35,7 +32,8 @@ var sketch = function (p: p5) {
         if(!weave.Jump()){
           console.log("knight trapped")
           weave.RefreshGrid();
-          // pause = true;
+          if(params.draw.pause_on_trap)
+            pause = true;
         }
         jump = false;
       }

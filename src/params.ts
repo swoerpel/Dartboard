@@ -12,25 +12,28 @@ export var params = {
   },
 
   draw:{
-    knight: false,
+    knight: true,
     weave: true,
-    jump_options: true,
+    jump_options: false,
+    pause_on_trap: true,
   },
 
   knight:{
     jump_x: 2,
     jump_y: 1,
-    alpha: 0.1
+    alpha: 1,
+    draw_mode: 'bars',
+
   },
 
   weave:{
     queue_length: 3,
     smooth_iters: 8,
     smooth_iter_start: 0,
-    smooth_dist_ratio: .25,
+    smooth_dist_ratio: 1,
     smooth_dist_ratio_inc: 0.005,
-    alpha: 1,
-    stroke_weight: 12,
+    alpha: .5,
+    stroke_cell_ratio: .25,
   },
 
   jump_options:{
@@ -40,13 +43,14 @@ export var params = {
   },
 
   color: {
-    palette: 'RdBu',
+    const: false,
+    const_color: 'black',
+    // palette: 'RdBu',
     // palette: 'Viridis',
-    // palette: 'Spectral',
+    palette: 'Spectral',
     // palette: 'lemon_citrus',
-    def_palette: 'Spectral',
     domain: 50,
-    background:'black',
+    background:'white',
   }
 
 }

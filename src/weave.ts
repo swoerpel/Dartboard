@@ -1,5 +1,6 @@
 import {params} from './params'
 import { SmoothLine, arrSum } from './helpers';
+import * as chroma from 'chroma.ts';
 
 export interface Cell{
     value: number;
@@ -94,10 +95,17 @@ export class Weave{
     }
 
     setWeaveColors(){
-        this.graphic.strokeWeight(params.weave.stroke_weight);
-        let cv = this.jump_count / params.color.domain;
-        let col = this.color_machine(cv).rgba()
+        let col;
+        if(!params.color.const){
+            let cv = this.jump_count / params.color.domain;
+            col = this.color_machine(cv).rgba()
+        }
+        else{
+            col = params.color.const_color
+            col = chroma.color(col).rgba()
+        }
         col[3] = params.weave.alpha * 255;
+        this.graphic.strokeWeight(params.weave.stroke_cell_ratio * this.cell_width);
         this.graphic.stroke(col);
     }
 
@@ -125,14 +133,28 @@ export class Weave{
         })
     }
 
+    drawKnightLUT = {
+        'squares': ()=> {
+            this.graphic.rect(
+                this.grid[this.knight_x][this.knight_y].x, 
+                this.grid[this.knight_x][this.knight_y].y, 
+                this.cell_width, 
+                this.cell_height
+            )
+        },
+        'bars': ()=> {
+            this.graphic.rect(
+                this.grid[this.knight_x][this.knight_y].x, 
+                this.grid[this.knight_x][this.knight_y].y, 
+                this.cell_width, 
+                this.cell_height*3
+            )
+        }
+    }
+
     drawKnight(){
         this.setKnightColors()
-        this.graphic.rect(
-            this.grid[this.knight_x][this.knight_y].x, 
-            this.grid[this.knight_x][this.knight_y].y, 
-            this.cell_width, 
-            this.cell_height
-        )
+        this.drawKnightLUT[params.knight.draw_mode]();
     }
     
     drawWeave(){
