@@ -1,4 +1,4 @@
-let len = 2400;
+let len = 4800;
 export var params = {
   canvas: {
     width: len,
@@ -6,39 +6,43 @@ export var params = {
   },
 
   grid:{
-    cols: 16,
-    rows: 16,
+    cols: 4,
+    rows: 4,
     max_value: 30,
   },
 
   draw:{
     knight: false,
     weave: true,
-    jump_options: false,
+    jump_options: true,
   },
 
   knight:{
     jump_x: 2,
     jump_y: 1,
+    alpha: 0.1
   },
 
   weave:{
     queue_length: 3,
     smooth_iters: 8,
     smooth_iter_start: 0,
-    smooth_dist_ratio: 0.25,
-    alpha: 0.5,
-    stroke_weight: 40,
+    smooth_dist_ratio: .25,
+    smooth_dist_ratio_inc: 0.005,
+    alpha: 1,
+    stroke_weight: 12,
   },
 
   jump_options:{
-    alpha: 0.5
+    alpha: 0.05,
+    shape: 'rect',
+    radius: 0.1,
   },
 
   color: {
-    // palette: 'RdYlGn',
+    palette: 'RdBu',
     // palette: 'Viridis',
-    palette: 'Spectral',
+    // palette: 'Spectral',
     // palette: 'lemon_citrus',
     def_palette: 'Spectral',
     domain: 50,

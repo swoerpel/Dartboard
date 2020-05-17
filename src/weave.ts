@@ -1,5 +1,5 @@
 import {params} from './params'
-import { SmoothLine } from './helpers';
+import { SmoothLine, arrSum } from './helpers';
 
 export interface Cell{
     value: number;
@@ -11,6 +11,8 @@ export interface Cell{
 
 export class Weave{
     grid: Cell[][] = [];
+    grid_sum: number; 
+    start_grid_sum: number;
     cell_width: number = params.canvas.width / params.grid.cols;
     cell_height: number = params.canvas.height / params.grid.rows;
     jump_count: number = 0;
@@ -55,6 +57,7 @@ export class Weave{
             }
             this.grid.push(row)
         }
+        this.start_grid_sum = arrSum(this.grid.map((row)=> row.map((cell)=>cell.value)))
         // this.grid.forEach((row) =>row.forEach((cell)=>console.log(cell)));
     }
 
@@ -82,24 +85,12 @@ export class Weave{
         return true;
     }
 
-    drawWeave(){
-
-        this.setWeaveColors()
-        const weave = this.weave_queue.map((cell_index) => {
-            return{
-                x: this.grid[cell_index.x][cell_index.y].cx,
-                y: this.grid[cell_index.x][cell_index.y].cy,
-            }
-        })
-
-        this.graphic.beginShape()
-        SmoothLine(
-            weave,
-            params.weave.smooth_iters,
-            params.weave.smooth_iter_start,
-            params.weave.smooth_dist_ratio,   
-        ).forEach((v)=>this.graphic.vertex(v.x,v.y));
-        this.graphic.endShape();
+    setKnightColors(){
+        this.graphic.strokeWeight(0);
+        let cv = arrSum(this.grid.map((row)=> row.map((cell)=>cell.value))) / this.start_grid_sum;
+        let col = this.color_machine(cv).rgba();
+        col[3] = 255 * params.knight.alpha;
+        this.graphic.fill(col);
     }
 
     setWeaveColors(){
@@ -108,6 +99,16 @@ export class Weave{
         let col = this.color_machine(cv).rgba()
         col[3] = params.weave.alpha * 255;
         this.graphic.stroke(col);
+    }
+
+    setOptionsColors(){
+        this.graphic.strokeWeight(0);
+        // this.graphic.fill(params.weave.stroke_weight);
+        let cv = this.jump_count / params.color.domain;
+        let col = this.color_machine(1 - cv).rgba()
+        col[3] = params.jump_options.alpha * 255;
+        col[3] = 150
+        this.graphic.fill(col);
     }
 
     rotateWeaveQueue(){
@@ -124,6 +125,58 @@ export class Weave{
         })
     }
 
+    drawKnight(){
+        this.setKnightColors()
+        this.graphic.rect(
+            this.grid[this.knight_x][this.knight_y].x, 
+            this.grid[this.knight_x][this.knight_y].y, 
+            this.cell_width, 
+            this.cell_height
+        )
+    }
+    
+    drawWeave(){
+        this.setWeaveColors();
+        const weave = this.weave_queue.map((cell_index) => {
+            return{
+                x: this.grid[cell_index.x][cell_index.y].cx,
+                y: this.grid[cell_index.x][cell_index.y].cy,
+            }
+        })
+        this.graphic.noFill();
+        this.graphic.beginShape()
+        SmoothLine(
+            weave,
+            params.weave.smooth_iters,
+            params.weave.smooth_iter_start,
+            params.weave.smooth_dist_ratio,   
+        ).forEach((v)=>this.graphic.vertex(v.x,v.y));
+        this.graphic.endShape();
+    }
+
+    drawOptions(options){
+        this.setOptionsColors();
+        options.map((op) =>{
+            if(params.jump_options.shape == 'circle'){
+                this.graphic.circle(
+                    this.grid[op.x][op.y].cx, 
+                    this.grid[op.x][op.y].cy, 
+                    this.cell_width * params.jump_options.radius, 
+                )
+            }
+            if(params.jump_options.shape == 'rect'){
+                let w = this.cell_width * params.jump_options.radius
+                let h = this.cell_height * params.jump_options.radius
+                this.graphic.rect(
+                    this.grid[op.x][op.y].cx, 
+                    this.grid[op.x][op.y].cy, 
+                    w - w/2,
+                    h - h/2,
+                )
+            }
+        })
+    }
+
     nextJumpIndex(options){
         let next_jump_index = -1;
         let high_value = -100000;
@@ -134,30 +187,6 @@ export class Weave{
             }
         })
         return next_jump_index;
-    }
-
-    drawKnight(){
-        let cv = this.jump_count / params.color.domain;
-        this.graphic.fill(this.color_machine(cv).hex());
-        this.graphic.rect(
-            this.grid[this.knight_x][this.knight_y].x, 
-            this.grid[this.knight_x][this.knight_y].y, 
-            this.cell_width, 
-            this.cell_height
-        )
-    }
-
-    drawOptions(options){
-        options.map((op) =>{
-            let cv = this.grid[op.x][op.y].value / params.grid.max_value
-            this.graphic.fill(this.color_machine(cv).hex());
-            this.graphic.rect(
-                this.grid[op.x][op.y].x, 
-                this.grid[op.x][op.y].y, 
-                this.cell_width, 
-                this.cell_height
-            )
-        })
     }
 
     calculateNext(){
@@ -180,7 +209,5 @@ export class Weave{
         options = options.filter((o)=>o.value != -1)
         return options
     }
-
-
 
 }

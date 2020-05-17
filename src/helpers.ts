@@ -8,17 +8,26 @@ export function RandReal(min, max, decimalPlaces = 0) {
     return Math.floor(rand*power) / power;
 }
 
+export function arrSum(array){
+  return array.reduce(
+      (sum, num) => sum + (Array.isArray(num) ? arrSum(num) : num * 1),
+      0
+  );
+}
+
 export function SmoothLine(
     line, 
     total_iters, 
     current_iter, 
-    dist_ratio
+    dist_ratio,
+    lattice = false
   ) {
     if(total_iters == current_iter)
       return line;
     else{
       let sm_line = []
-      sm_line.push(line[0])
+      if(lattice)
+        sm_line.push(line[0])
       for (let i = 0; i < line.length - 1; i++) {
         let distance = 
           Math.sqrt(Math.pow(line[i + 1].x - line[i].x, 2) + 
@@ -34,7 +43,8 @@ export function SmoothLine(
           y: line[i].y + (d / distance) * (line[i + 1].y - line[i].y)
         })
       }
-      sm_line.push(line[line.length - 1])
+      if(lattice)
+        sm_line.push(line[line.length - 1])
       return SmoothLine(sm_line, total_iters, current_iter + 1, dist_ratio)
     }
   }

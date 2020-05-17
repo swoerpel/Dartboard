@@ -35,7 +35,7 @@ var sketch = function (p: p5) {
         if(!weave.Jump()){
           console.log("knight trapped")
           weave.RefreshGrid();
-          pause = true;
+          // pause = true;
         }
         jump = false;
       }
@@ -76,16 +76,23 @@ var sketch = function (p: p5) {
   }
 
   p.keyPressed = function (){
-    console.log(event)
     switch(event.key){
       case " ": pause = !pause; break;
       case "a": auto = !auto; break;
       case "j": jump = true; break;
       case "r": graphic.background(params.color.background); break;
       case "c": randomizeColorMachine(); break;
-      case "ArrowRight": break;
-      case "ArrowLeft": break;
+      case "ArrowRight":modifySmoothRatio(true); break;
+      case "ArrowLeft":modifySmoothRatio(false); break;
     }
+  }
+
+  function modifySmoothRatio(inc){
+    if(inc)
+      params.weave.smooth_dist_ratio += params.weave.smooth_dist_ratio_inc
+    else
+      params.weave.smooth_dist_ratio -= params.weave.smooth_dist_ratio_inc
+    console.log(params.weave.smooth_dist_ratio)
   }
   
 }
