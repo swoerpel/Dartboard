@@ -1,4 +1,5 @@
 import {params} from './params'
+import { SmoothLine } from './helpers';
 
 export interface Cell{
     value: number;
@@ -9,14 +10,16 @@ export interface Cell{
 }
 
 export class Weave{
-    cell_width = params.canvas.width / params.grid.cols;
-    cell_height = params.canvas.height / params.grid.rows;
     grid: Cell[][] = [];
+    cell_width: number = params.canvas.width / params.grid.cols;
+    cell_height: number = params.canvas.height / params.grid.rows;
     jump_count: number = 0;
     cell_count: number = 0;
     knight_x: number = Math.floor(params.grid.cols / 2);
     knight_y: number = Math.floor(params.grid.rows / 2);
     knight_jump_offsets: {x:number;y:number}[] = [];
+    weave_queue: any = new Array(params.weave.queue_length).fill({x:this.knight_x,y:this.knight_y});
+
     constructor(
         public graphic, 
         public color_machine,
@@ -58,7 +61,6 @@ export class Weave{
     Jump(){
         const options = this.calculateNext()
         if(options.length == 0){
-            console.log("knight trapped")
             this.jump_count = 0;
             return false;
         }
@@ -66,12 +68,60 @@ export class Weave{
             this.drawOptions(options);
         if(params.draw.knight)
             this.drawKnight();
+        if(params.draw.weave)
+            this.drawWeave();
+        
+        this.rotateWeaveQueue()
+
         let next_jump_index = this.nextJumpIndex(options);
         this.knight_x = options[next_jump_index].x
         this.knight_y = options[next_jump_index].y
         this.grid[this.knight_x][this.knight_y].value = -1;
         this.jump_count = (this.jump_count + 1) % params.color.domain;
+        // this.printWeaveQueue()
         return true;
+    }
+
+    drawWeave(){
+
+        this.setWeaveColors()
+        const weave = this.weave_queue.map((cell_index) => {
+            return{
+                x: this.grid[cell_index.x][cell_index.y].cx,
+                y: this.grid[cell_index.x][cell_index.y].cy,
+            }
+        })
+
+        this.graphic.beginShape()
+        SmoothLine(
+            weave,
+            params.weave.smooth_iters,
+            params.weave.smooth_iter_start,
+            params.weave.smooth_dist_ratio,   
+        ).forEach((v)=>this.graphic.vertex(v.x,v.y));
+        this.graphic.endShape();
+    }
+
+    setWeaveColors(){
+        this.graphic.strokeWeight(params.weave.stroke_weight);
+        let cv = this.jump_count / params.color.domain;
+        let col = this.color_machine(cv).rgba()
+        col[3] = params.weave.alpha * 255;
+        this.graphic.stroke(col);
+    }
+
+    rotateWeaveQueue(){
+        this.weave_queue.push({
+            x: this.knight_x,
+            y: this.knight_y,
+        })
+        this.weave_queue.shift();
+    }
+
+    printWeaveQueue(){
+        this.weave_queue.forEach((w)=>{
+            console.log('x: ',w.x,',y: ',w.y)
+        })
     }
 
     nextJumpIndex(options){

@@ -5,18 +5,16 @@ export var params = {
     height:len,
   },
 
-  draw:{
-    jump_options: false,
-    jump_options_alpha: 0.5,
-
-    knight: true,
+  grid:{
+    cols: 16,
+    rows: 16,
+    max_value: 30,
   },
 
-  
-  grid:{
-    cols: 8,
-    rows: 8,
-    max_value: 30,
+  draw:{
+    knight: false,
+    weave: true,
+    jump_options: false,
   },
 
   knight:{
@@ -24,6 +22,18 @@ export var params = {
     jump_y: 1,
   },
 
+  weave:{
+    queue_length: 3,
+    smooth_iters: 8,
+    smooth_iter_start: 0,
+    smooth_dist_ratio: 0.25,
+    alpha: 0.5,
+    stroke_weight: 40,
+  },
+
+  jump_options:{
+    alpha: 0.5
+  },
 
   color: {
     // palette: 'RdYlGn',
