@@ -87,11 +87,12 @@ export class Weave{
     }
 
     setKnightColors(){
-        this.graphic.strokeWeight(0);
+        this.graphic.strokeWeight(params.knight.stroke_cell_ratio * this.cell_width);
         let cv = arrSum(this.grid.map((row)=> row.map((cell)=>cell.value))) / this.start_grid_sum;
         let col = this.color_machine(cv).rgba();
         col[3] = 255 * params.knight.alpha;
         this.graphic.fill(col);
+        this.graphic.stroke(this.color_machine(1 - cv).hex())
     }
 
     setWeaveColors(){
@@ -147,7 +148,7 @@ export class Weave{
                 this.grid[this.knight_x][this.knight_y].x, 
                 this.grid[this.knight_x][this.knight_y].y, 
                 this.cell_width, 
-                this.cell_height*3
+                params.canvas.height - this.grid[this.knight_x][this.knight_y].y,
             )
         }
     }
