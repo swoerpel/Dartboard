@@ -18,38 +18,60 @@ export class Weave{
     cell_height: number = params.canvas.height / params.grid.rows;
     jump_count: number = 0;
     cell_count: number = 0;
-    knight_x: number = Math.floor(params.grid.cols / 2);
-    knight_y: number = Math.floor(params.grid.rows / 2);
+
+    knightStartLUT = {
+        'center':  {
+            x: Math.floor(params.grid.cols / 2),
+            y: Math.floor(params.grid.rows / 2)
+        },
+        'start':  {
+            x: 0,
+            y: 0
+        },
+    }
+
+    knight_x: number = this.knightStartLUT[params.knight.start].x;
+    knight_y: number = this.knightStartLUT[params.knight.start].y;
+    weave_queue = new Array(params.weave.queue_length).fill({x:this.knight_x,y:this.knight_y});
     knight_jump_offsets: {x:number;y:number}[] = [];
-    weave_queue: any = new Array(params.weave.queue_length).fill({x:this.knight_x,y:this.knight_y});
 
     constructor(
         public graphic, 
         public color_machine,
     ){}
 
+
     RefreshKnight(){
+        this.knight_x = this.knightStartLUT[params.knight.start].x;
+        this.knight_y = this.knightStartLUT[params.knight.start].y;
         for(let i = 0; i < 4; i++){
             const muls = Array.from(i.toString(2).padStart(2,'0')).map((m) => parseInt(m));
             const x_mul = muls[0] ? -1 : 1;
             const y_mul = muls[1] ? -1 : 1;
-            const x = x_mul * params.knight.jump_x
-            const y = y_mul * params.knight.jump_y
+            const x = x_mul * params.knight.jump.x
+            const y = y_mul * params.knight.jump.y
             this.knight_jump_offsets.push({x:x,y:y});
             this.knight_jump_offsets.push({x:y,y:x});
         }
-        console.log('this.knight_jump_offsets',this.knight_jump_offsets)
+        // console.log('this.knight_jump_offsets',this.knight_jump_offsets)
     }
 
     RefreshGrid(){
         this.grid = []
         this.cell_count = 0;
+
         for(let i = 0; i < params.grid.cols; i++){
             let row = [];
             for(let j = 0; j < params.grid.rows; j++){
+                let value;
+                if(params.grid.random)
+                    value = Math.floor(Math.random() * params.grid.max_value)                
+                else
+                    value = this.cell_count % params.grid.max_value,
+                console.log('value',value)
                 row.push({
                     index: this.cell_count++,
-                    value: Math.floor(Math.random() * params.grid.max_value),
+                    value: value,
                     x: i * this.cell_width,
                     y: j * this.cell_height,
                     cx: i * this.cell_width + (this.cell_width / 2),
@@ -129,6 +151,7 @@ export class Weave{
     }
 
     printWeaveQueue(){
+        console.log('weave queue')
         this.weave_queue.forEach((w)=>{
             console.log('x: ',w.x,',y: ',w.y)
         })
