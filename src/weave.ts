@@ -68,7 +68,6 @@ export class Weave{
                     value = Math.floor(Math.random() * params.grid.max_value)                
                 else
                     value = this.cell_count % params.grid.max_value,
-                console.log('value',value)
                 row.push({
                     index: this.cell_count++,
                     value: value,

@@ -103,10 +103,14 @@ var sketch = function (p: p5) {
     }
     color_palettes = { ...color_palettes, ...chroma.brewer };
     console.log('chroma.brewer',chroma.brewer)
-    if(params.color.palette in color_palettes)
-      color_machine = chroma.scale(color_palettes[params.color.palette]);
-    else
-      color_machine = chroma.scale(['black','white']);
+    if(Array.isArray(params.color.palette)){
+      color_machine = chroma.scale(params.color.palette);
+    }else{
+      if(params.color.palette in color_palettes)
+        color_machine = chroma.scale(color_palettes[params.color.palette]);
+      else
+        color_machine = chroma.scale(['black','white']);
+    }
   }
 
   function randomizeColorMachine(){
