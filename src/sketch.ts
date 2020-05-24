@@ -7,6 +7,7 @@ import { Clock } from './clock';
 var sketch = function (p: p5) {
   var pause = false;
   var draw_weave = false;
+  var auto = false;
   var canvas;
   var graphic;
   var clock: Clock;
@@ -33,6 +34,7 @@ var sketch = function (p: p5) {
         clock.drawInnerRings();
       if(params.draw.weave && draw_weave){
         // if(draw_index % 10 == 0)
+        if(!auto)
           draw_weave = false;
         clock.drawWeave();
       }
@@ -78,6 +80,7 @@ var sketch = function (p: p5) {
     switch(event.key){
       case " ": pause = !pause; break;
       case "d": draw_weave = true; break;
+      case "a": auto = !auto; break;
       case "ArrowRight": params.boundary_ring.spokes += 1; break;
       case "ArrowLeft": params.boundary_ring.spokes -= 1; break;
       case "g": graphic.background(params.color.background); break;

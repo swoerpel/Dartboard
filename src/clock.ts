@@ -1,6 +1,5 @@
 import {params} from './params'
-import { getRadialVertices } from './helpers';
-// import * as chroma from 'chroma.ts';
+import { getRadialVertices, SmoothLine } from './helpers';
 import { Point } from './models';
 
 export class Clock{
@@ -34,6 +33,7 @@ export class Clock{
             this.boundary_ring_points,
             params.boundary_ring.stroke_weight,
             params.color.boundary_ring,
+            false,
         )
     }
 
@@ -44,11 +44,23 @@ export class Clock{
                 points, 
                 params.inner_rings[i].stroke_weight,
                 params.inner_rings[i].color,
+                false,
             )
         })
     }
 
+    private getStartEndPoints(){
+        return {
+            start: 
+        }
+    }
+
     public drawWeave(){ 
+        start_end_points = this.getStartEndPoints();
+
+
+
+
         const startPoint = this.boundary_ring_points[
             Math.floor(Math.random() * this.boundary_ring_points.length)]
         const endPoint = this.boundary_ring_points[
@@ -58,13 +70,14 @@ export class Clock{
         for(let i = 0; i < params.weave.inner_connections; i++){
             const points = this.inner_ring_points[0]
             const p = points[Math.floor(Math.random() * points.length)];
+            // const p = this.inner_ring_points[0].pop()
             weave_path.push(p)
         }
         weave_path.push(endPoint);
-        console.log('1/this.thread_count',1/this.thread_count)
         // const c = this.color_machine(1/this.thread_count).hex();
         const c = params.color.weave;
-        this.draw_path(weave_path, 10, c);
+        console.log('weave_path',weave_path)
+        this.draw_path(weave_path, params.weave.stroke_weight, c);
         this.thread_count++;
     }
 
@@ -86,18 +99,36 @@ export class Clock{
         })
     }
     
-    private draw_path(points, stroke_weight, stroke){
+    private draw_path(points, stroke_weight, stroke, smooth = true){
         this.graphic.stroke(stroke);
         this.graphic.noFill();
         this.graphic.strokeWeight(stroke_weight);
         this.graphic.beginShape();
-        points.forEach((p)=>{
-            this.graphic.vertex(p.x,p.y)
-            this.graphic.strokeWeight(params.weave.point_size * params.canvas.width);
-            this.graphic.point(p.x,p.y)
+        if(smooth){
+            if(points.length < 3){
+                points.forEach((p)=>{
+                    this.graphic.vertex(p.x,p.y)
+                })
+            }else{
+                this.graphic.vertex(points[0].x, points[0].y)
+                SmoothLine(
+                    [...points], 
+                    params.weave.smooth_iters, 
+                    0, 
+                    params.weave.dist_ratio,
+                    true,
+                ).forEach((p)=>{
+                    this.graphic.vertex(p.x,p.y)
+                    // this.graphic.strokeWeight(params.weave.point_size * params.canvas.width);
+                })
+                this.graphic.vertex(points[points.length - 1].x, points[points.length - 1].y)
+            }
+        }else{
             this.graphic.strokeWeight(stroke_weight);
-
-        })
+            points.forEach((p)=>{
+                this.graphic.point(p.x,p.y)
+            })
+        }
         // this.graphic.vertex(points[0].x,points[0].y)
         this.graphic.endShape()
     }

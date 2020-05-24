@@ -20,13 +20,16 @@ export var params = {
 
   weave:{
     inner_connections: 1,
-    point_size: 0.05,
+    point_size: 0.01,
+    dist_ratio: .25,
+    smooth_iters: 8,
+    stroke_weight: 3,
     // inner_ring_index: 0, //remove later
   },
 
   boundary_ring:{
     diameter: 1,
-    spokes: 8,
+    spokes: 4,
     stroke_weight: 5,
     color: 'white',
   },
@@ -34,7 +37,7 @@ export var params = {
 
   inner_rings:[
     {
-      diameter: .5,
+      diameter: .25,
       spokes: 8,
       stroke_weight: 5,
       color:'blue'

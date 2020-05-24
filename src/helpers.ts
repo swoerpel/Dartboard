@@ -45,6 +45,7 @@ export function SmoothLine(
     dist_ratio,
     lattice = false
   ) {
+
     if(total_iters == current_iter)
       return line;
     else{
@@ -68,6 +69,7 @@ export function SmoothLine(
       }
       if(lattice)
         sm_line.push(line[line.length - 1])
+      
       return SmoothLine(sm_line, total_iters, current_iter + 1, dist_ratio)
     }
   }
