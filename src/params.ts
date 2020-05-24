@@ -7,9 +7,9 @@ export var params = {
 
   draw:{
     clock: true,
-    boundary_ring: true,
+    boundary_ring: false,
     weave: true,
-    inner_rings: true,
+    inner_rings: false,
   },
 
   
@@ -23,7 +23,7 @@ export var params = {
     point_size: 0.01,
     dist_ratio: .25,
     smooth_iters: 8,
-    stroke_weight: 3,
+    stroke_weight: 10,
     // inner_ring_index: 0, //remove later
   },
 

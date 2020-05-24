@@ -1,4 +1,4 @@
-export var round = (N,acc = 100000) => {
+export var Round = (N,acc = 100000) => {
     return Math.round(N * acc) / acc
   }
 
@@ -15,12 +15,8 @@ export function getRadialVertices(
   for (let a = -angle; a <= Math.PI * 2 * (1 - 1 / vertices); a += angle) {
       let sx = origin.x + Math.cos(a + orientation + rotation) * radius;
       let sy = origin.y + Math.sin(a + orientation + rotation) * radius;
-      points.push({ x: sx, y: sy })
+      points.push({ x: Round(sx), y: Round(sy) })
   }
-  // points.push({
-  //   x:Math.cos(orientation + rotation) * radius,
-  //   y:Math.sin(orientation + rotation) * radius,
-  // })
   return points
 }
 
