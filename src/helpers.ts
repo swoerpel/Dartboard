@@ -2,6 +2,29 @@ export var round = (N,acc = 100000) => {
     return Math.round(N * acc) / acc
   }
 
+
+export function getRadialVertices(
+  origin: {x:number,y:number}, 
+  radius: number, 
+  vertices: number = 37,
+  rotation:number = 0
+) {
+  let angle = Math.PI * 2 / vertices
+  let points = []
+  let orientation = Math.PI / vertices // -> pointy top : 0 -> flat top
+  for (let a = -angle; a <= Math.PI * 2 * (1 - 1 / vertices); a += angle) {
+      let sx = origin.x + Math.cos(a + orientation + rotation) * radius;
+      let sy = origin.y + Math.sin(a + orientation + rotation) * radius;
+      points.push({ x: sx, y: sy })
+  }
+  // points.push({
+  //   x:Math.cos(orientation + rotation) * radius,
+  //   y:Math.sin(orientation + rotation) * radius,
+  // })
+  return points
+}
+
+
 export function RandReal(min, max, decimalPlaces = 0) {  
     var rand = Math.random()*(max-min) + min;
     var power = Math.pow(10, decimalPlaces);
