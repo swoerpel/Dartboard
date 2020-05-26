@@ -10,3 +10,13 @@ export interface Cell{
     cx:number;
     cy:number;
 }
+
+
+export interface RingParams{
+    index:number;
+    origin:{x:number;y:number;},
+    radius:number;
+    draw: boolean;
+    stroke_weight:number;
+    points:Point[];
+}

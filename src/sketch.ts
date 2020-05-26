@@ -2,50 +2,31 @@ import * as p5 from 'p5'
 import * as chroma from 'chroma.ts';
 import * as tome from 'chromotome';
 import {params} from './params'
-import { Clock } from './clock';
+import { RingGroup } from './ring';
 
 var sketch = function (p: p5) {
   var pause = false;
-  var draw_weave = false;
   var auto = false;
   var canvas;
   var graphic;
-  var clock: Clock;
   var draw_index = 0;
+  var ring_group: RingGroup
   var color_machine;
-  
+
   var color_palettes = {};
   p.setup = function () {
     setupColors();
     setupGraphics();
-    setupClock();
+    ring_group = new RingGroup(graphic);
+    ring_group.setup();
   }
 
-  function setupClock(){
-    clock = new Clock(graphic, color_machine);
-    clock.setupRings();
-  }
 
-  function modifyWeaveStrokeWeight(){
-    if(draw_index % params.weave.sw.freq)
-      params.weave.sw.init += params.weave.sw.step
-    if (params.weave.sw.init > params.weave.sw.max)
-      params.weave.sw.init = params.weave.sw.min
-  }
 
   p.draw = function () {
     if(!pause){
-      if(params.draw.boundary_ring)
-        clock.drawBoundaryRing();
-      if(params.draw.inner_rings)
-        clock.drawInnerRings();
-      if(params.draw.weave && draw_weave){
-        if(!auto)
-          draw_weave = false;
-        if(params.draw.toggle_weave_stroke_weight)
-          modifyWeaveStrokeWeight()
-        clock.drawWeave();
-      }
+      if(params.draw.ring_group)
+        ring_group.draw();
       p.image(graphic, 0, 0)
       draw_index++;
     }

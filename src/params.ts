@@ -1,4 +1,4 @@
-let len = 4800;
+let len = 2400;
 export var params = {
   canvas: {
     width: len,
@@ -6,11 +6,18 @@ export var params = {
   },
 
   draw:{
-    clock: true,
-    boundary_ring: true,
     weave: true,
-    inner_rings: false,
-    toggle_weave_stroke_weight: false,
+    ring_group: true,
+  },
+
+  ring_group:{
+    layout: 'linear',
+    count: 3,
+    stroke_weight:[0.05], 
+    spokes: [6,8,10], 
+    radius:[0.1],    
+    point_order:['linear'],
+    draw:[true]
   },
 
   weave:{
@@ -61,9 +68,9 @@ export var params = {
     // palette: 'Viridis',
     // palette: 'Spectral',
     // palette: 'lemon_citrus',
-    palette: ['black','black'],
+    palette: ['white','white'],
     domain: 40,
-    background:'white',
+    background:'black',
   }
 
 }
