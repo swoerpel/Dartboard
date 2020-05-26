@@ -68,14 +68,13 @@ export class Clock{
         for(let i = 0; i < params.weave.inner_connections; i++){
             const points = this.inner_ring_points[0]
             const p = points[Math.floor(Math.random() * points.length)];
-            // const p = this.inner_ring_points[0].pop()
             weave_path.push(p)
         }
         weave_path.push(start_end_points.end);
-        // const c = this.color_machine(1/this.thread_count).hex();
-        const c = params.color.weave;
-        console.log('weave_path',weave_path)
-        this.draw_path(weave_path, params.weave.stroke_weight, c);
+        const c = this.color_machine(this.thread_count % params.color.domain / params.color.domain).rgba();
+        c[3] = params.weave.alpha * 255;
+
+        this.draw_path(weave_path, params.weave.sw.init, c);
         this.thread_count++;
     }
 

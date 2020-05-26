@@ -1,4 +1,4 @@
-let len = 2400;
+let len = 4800;
 export var params = {
   canvas: {
     width: len,
@@ -7,42 +7,43 @@ export var params = {
 
   draw:{
     clock: true,
-    boundary_ring: false,
+    boundary_ring: true,
     weave: true,
     inner_rings: false,
+    toggle_weave_stroke_weight: false,
   },
-
-  
-  clock:{
-
-  },
-
 
   weave:{
     inner_connections: 1,
     point_size: 0.01,
     dist_ratio: .25,
     smooth_iters: 8,
-    stroke_weight: 10,
+    sw:{
+      init: 4,
+      min: 50,
+      max: 151,
+      step: 50,
+      freq: 80 ,
+    },
+    alpha: 1
     // inner_ring_index: 0, //remove later
   },
 
   boundary_ring:{
-    diameter: 1,
-    spokes: 4,
-    stroke_weight: 5,
+    diameter: .9,
+    spokes: 7,
+    stroke_weight:20,
     color: 'white',
   },
 
 
   inner_rings:[
     {
-      diameter: .25,
-      spokes: 8,
-      stroke_weight: 5,
-      color:'blue'
+      diameter: .5,
+      spokes: 16,
+      stroke_weight: 20,
+      color:'white'
     },
-
   ],
 
 
@@ -54,15 +55,15 @@ export var params = {
     weave: 'orange',
     // palette: 'hilda02',
     // palette: 'tundra4',
-    palette: 'winter-night',
+    // palette: 'winter-night',
     // palette: 'cc232',
     // palette: 'RdBu',
     // palette: 'Viridis',
     // palette: 'Spectral',
     // palette: 'lemon_citrus',
-    // palette: ['black','red','yellow','blue'],
-    domain: 10,
-    background:'black',
+    palette: ['black','black'],
+    domain: 40,
+    background:'white',
   }
 
 }

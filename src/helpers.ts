@@ -6,7 +6,7 @@ export var Round = (N,acc = 100000) => {
 export function getRadialVertices(
   origin: {x:number,y:number}, 
   radius: number, 
-  vertices: number = 37,
+  vertices: number = 4,
   rotation:number = 0
 ) {
   let angle = Math.PI * 2 / vertices

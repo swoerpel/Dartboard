@@ -26,6 +26,13 @@ var sketch = function (p: p5) {
     clock.setupRings();
   }
 
+  function modifyWeaveStrokeWeight(){
+    if(draw_index % params.weave.sw.freq)
+      params.weave.sw.init += params.weave.sw.step
+    if (params.weave.sw.init > params.weave.sw.max)
+      params.weave.sw.init = params.weave.sw.min
+  }
+
   p.draw = function () {
     if(!pause){
       if(params.draw.boundary_ring)
@@ -33,9 +40,10 @@ var sketch = function (p: p5) {
       if(params.draw.inner_rings)
         clock.drawInnerRings();
       if(params.draw.weave && draw_weave){
-        // if(draw_index % 10 == 0)
         if(!auto)
           draw_weave = false;
+        if(params.draw.toggle_weave_stroke_weight)
+          modifyWeaveStrokeWeight()
         clock.drawWeave();
       }
       p.image(graphic, 0, 0)
