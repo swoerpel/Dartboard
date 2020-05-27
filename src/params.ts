@@ -42,6 +42,7 @@ export var params = {
       fill: false,
       alpha: 1,
       stroke_weight: 10,
+      stroke: 'white'
     }
   },
 

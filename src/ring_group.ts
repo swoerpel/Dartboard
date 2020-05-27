@@ -1,13 +1,10 @@
 import { Point, RingParams } from "./models";
 import { params } from "./params";
-import { getRadialVertices, maxPoint, minPoint, arrayRotate, minMaxPoint } from "./helpers";
-import { POINT_CONVERSION_COMPRESSED } from "constants";
+import { getRadialVertices, maxPoint, minMaxPoint } from "./helpers";
 
-export class RingGroup{
+export class RingGroup {
 
     private rings: RingParams[] = [];
-    private first_jump: boolean;
-
     private origin_layout_LUT = {
         'concentric': ():Point[] => {
             return new Array(params.ring_group.count)
@@ -53,7 +50,6 @@ export class RingGroup{
 
     setup(){
         this.rings = [];
-        this.first_jump = true;
         const origins = this.origin_layout_LUT[params.ring_group.layout]();
         for(let i = 0; i < params.ring_group.count; i++){
             const radius = params.ring_group.radius[i % params.ring_group.radius.length] * params.canvas.height
@@ -66,7 +62,6 @@ export class RingGroup{
                 spokes,
                 value_offset
             )
-            console.log('pointspre->',points)
             points = points.map((point, j) => {
                 return{
                     ...point, 
@@ -75,7 +70,6 @@ export class RingGroup{
                     )
                 }
             });
-            console.log('pointspost->', points)
             this.rings.push({
                 index: i,
                 origin: origins[i],

@@ -5,6 +5,7 @@ import {params} from './params'
 import { RingGroup } from './ring_group';
 import { Point } from './models';
 import { sumPointValues, SmoothLine } from './helpers';
+import { Weave } from './weave';
 
 var sketch = function (p: p5) {
   var pause = false;
@@ -13,7 +14,8 @@ var sketch = function (p: p5) {
   var canvas;
   var graphic;
   var draw_index = 0;
-  var ring_group: RingGroup
+  var ring_group: RingGroup;
+  var weave: Weave;
   var color_machine;
 
   var color_palettes = {};
@@ -21,7 +23,7 @@ var sketch = function (p: p5) {
     setupColors();
     setupGraphics();
     setupRingGroup();
-
+    setupWeave();
   }
 
   var setupRingGroup = function(){
@@ -29,56 +31,31 @@ var sketch = function (p: p5) {
     ring_group.setup();
   }
 
+  var setupWeave = function(){
+    weave = new Weave(graphic, color_machine);
+    weave.setup();
+  }
+
   p.draw = function () {
     if(!pause){
       if(params.draw.ring_group)
         ring_group.draw();
-      if(params.draw.weave && draw_weave)
-        drawWeave();
+      if(params.draw.weave && draw_weave){
+        let next_jumps:Point[] = [];
+        for(let i = 0; i < params.ring_group.count; i++){
+          const jump_index = params.weave.pattern[i % params.weave.pattern.length]
+          next_jumps.push(ring_group.jump(jump_index));
+        }
+        if(!weave.draw(p,next_jumps)){
+          pause = true;
+          setupRingGroup();
+        }
+      }
       p.image(graphic, 0, 0)
       draw_index++;
     }
   }
 
-  function drawWeave(){
-    let next_jumps:Point[] = [];
-    for(let i = 0; i < params.ring_group.count; i++){
-      const jump_index = params.weave.pattern[i % params.weave.pattern.length]
-      next_jumps.push(ring_group.jump(jump_index));
-    }
-    const pause_sum = sumPointValues(next_jumps);
-    if(pause_sum == -params.weave.pattern.length){
-      pause = true;
-      setupRingGroup();
-    }else{
-      next_jumps = SmoothLine(
-        [...next_jumps],
-        params.weave.smooth.total_iters,
-        params.weave.smooth.init_iter,
-        params.weave.smooth.dist_ratio,
-        params.weave.smooth.lattice,
-      );
-      graphic.strokeWeight(params.weave.draw.stroke_weight)
-      if(params.weave.draw.fill){
-
-        graphic.fill('lightblue')
-      }
-      else
-        graphic.noFill();
-      
-
-      graphic.beginShape();
-      next_jumps.forEach((next_jump)=>{
-        // if(next_jump.value != -1){
-        graphic.vertex(
-          next_jump.x,
-          next_jump.y
-        );
-        // }
-      })
-      graphic.endShape(p.CLOSE);
-    }
-  }
 
   function setupColors(){
     let chromotome_palettes = tome.getAll();
