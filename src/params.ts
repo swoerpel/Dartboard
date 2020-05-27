@@ -12,12 +12,21 @@ export var params = {
 
   ring_group:{
     layout: 'linear',
+    draw_origins: true,
     count: 3,
-    stroke_weight:[0.05], 
-    spokes: [6,8,10], 
+    stroke_weight:[0.02], 
+    spokes: [8], 
     radius:[0.1],    
-    point_order:['linear'],
-    draw:[true]
+    draw:[true],
+    point:{
+      order:['linear'],
+      value:{
+        offset: [0],
+        scale: 1,
+        domain: 8
+      },
+    },
+    
   },
 
   weave:{
@@ -66,9 +75,9 @@ export var params = {
     // palette: 'cc232',
     // palette: 'RdBu',
     // palette: 'Viridis',
-    // palette: 'Spectral',
+    palette: 'Spectral',
     // palette: 'lemon_citrus',
-    palette: ['white','white'],
+    // palette: ['white','white'],
     domain: 40,
     background:'black',
   }

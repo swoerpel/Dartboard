@@ -2,12 +2,17 @@ export var Round = (N,acc = 100000) => {
     return Math.round(N * acc) / acc
   }
 
+export function arrayRotate(arr: any[], count: number) {
+    count -= arr.length * Math.floor(count / arr.length);
+    arr.push.apply(arr, arr.splice(0, count));
+    return arr;
+  }
 
 export function getRadialVertices(
   origin: {x:number,y:number}, 
   radius: number, 
   vertices: number = 4,
-  rotation:number = 0
+  rotation:number = 0,
 ) {
   let angle = Math.PI * 2 / vertices
   let points = []

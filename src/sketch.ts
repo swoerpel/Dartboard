@@ -2,7 +2,7 @@ import * as p5 from 'p5'
 import * as chroma from 'chroma.ts';
 import * as tome from 'chromotome';
 import {params} from './params'
-import { RingGroup } from './ring';
+import { RingGroup } from './ring_group';
 
 var sketch = function (p: p5) {
   var pause = false;
@@ -17,7 +17,7 @@ var sketch = function (p: p5) {
   p.setup = function () {
     setupColors();
     setupGraphics();
-    ring_group = new RingGroup(graphic);
+    ring_group = new RingGroup(graphic, color_machine);
     ring_group.setup();
   }
 
