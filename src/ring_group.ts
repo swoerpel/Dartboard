@@ -1,6 +1,6 @@
 import { Point, RingParams } from "./models";
 import { params } from "./params";
-import { getRadialVertices, arrayRotate } from "./helpers";
+import { getRadialVertices } from "./helpers";
 
 export class RingGroup{
 
@@ -38,10 +38,9 @@ export class RingGroup{
             Math.floor(
                 Math.random() *
                 spokes *
-                params.ring_group.point.value.scale *
-                params.ring_group.point.value.domain +
+                params.ring_group.point.value.scale +
                 offset
-            ),
+            )
     }
 
     constructor(
@@ -55,7 +54,6 @@ export class RingGroup{
             const spokes = params.ring_group.spokes[i % params.ring_group.spokes.length]
             const value_type = params.ring_group.point.order[i % params.ring_group.point.order.length];
             const value_offset = params.ring_group.point.value.offset[i % params.ring_group.point.value.offset.length]
-            console.log('value_type',value_type)
             const points = getRadialVertices(
                 origins[i],
                 radius,
@@ -65,18 +63,17 @@ export class RingGroup{
                     ...point, 
                     value: this.point_value_LUT[value_type](j,spokes, value_offset)
                 }
-            })
-
-
-            console.log(points, spokes)
-            
+            });
             this.rings.push({
                 index: i,
                 origin: origins[i],
                 radius: radius,
                 draw: params.ring_group.draw[i % params.ring_group.draw.length],
                 stroke_weight: params.ring_group.stroke_weight[i % params.ring_group.stroke_weight.length],
-                points: points
+                points: points,
+                max_value: points.reduce(function(next, max) {
+                    return (next.value > max.value) ? next : max
+                }).value
             })
         }
         console.log('rings ->',this.rings)
@@ -84,15 +81,11 @@ export class RingGroup{
 
 
       draw(){
-        
         this.rings.forEach((ring: RingParams, i) =>{
             if(ring.draw){
                 this.graphic.strokeWeight(params.canvas.width * ring.stroke_weight)
                 ring.points.forEach((p: Point)=>{
-
-                    
-                    // point values are already % point.value.domain
-                    let cv = p.value / params.ring_group.point.value.domain;
+                    let cv = p.value / ring.max_value;
                     let color = this.color_machine(cv).rgba()
                     color[3] = 255;
                     this.graphic.stroke(color);

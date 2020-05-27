@@ -27,6 +27,8 @@ var sketch = function (p: p5) {
     if(!pause){
       if(params.draw.ring_group)
         ring_group.draw();
+      if(params.draw.weave)
+        
       p.image(graphic, 0, 0)
       draw_index++;
     }

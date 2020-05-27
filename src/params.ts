@@ -15,53 +15,23 @@ export var params = {
     draw_origins: true,
     count: 3,
     stroke_weight:[0.02], 
-    spokes: [8], 
+    spokes: [8,31,5], 
     radius:[0.1],    
     draw:[true],
     point:{
-      order:['linear'],
+      order:['linear','random'],
       value:{
-        offset: [0],
+        offset: [0,1,2],
         scale: 1,
-        domain: 8
+        domain: 31
       },
     },
     
   },
 
   weave:{
-    inner_connections: 1,
-    point_size: 0.01,
-    dist_ratio: .25,
-    smooth_iters: 8,
-    sw:{
-      init: 4,
-      min: 50,
-      max: 151,
-      step: 50,
-      freq: 80 ,
-    },
-    alpha: 1
-    // inner_ring_index: 0, //remove later
+
   },
-
-  boundary_ring:{
-    diameter: .9,
-    spokes: 7,
-    stroke_weight:20,
-    color: 'white',
-  },
-
-
-  inner_rings:[
-    {
-      diameter: .5,
-      spokes: 16,
-      stroke_weight: 20,
-      color:'white'
-    },
-  ],
-
 
 
   color: {
