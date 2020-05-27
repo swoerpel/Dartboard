@@ -1,6 +1,6 @@
 import { Point, RingParams } from "./models";
 import { params } from "./params";
-import { getRadialVertices, maxPoint, minPoint } from "./helpers";
+import { getRadialVertices, maxPoint, minPoint, arrayRotate } from "./helpers";
 import { POINT_CONVERSION_COMPRESSED } from "constants";
 
 export class RingGroup{
@@ -71,16 +71,19 @@ export class RingGroup{
             const spokes = params.ring_group.spokes[i % params.ring_group.spokes.length]
             const value_type = params.ring_group.point.order[i % params.ring_group.point.order.length];
             const value_offset = params.ring_group.point.value.offset[i % params.ring_group.point.value.offset.length]
-            const points = getRadialVertices(
+            console.log('value_offset',value_offset)
+            let points = getRadialVertices(
                 origins[i],
                 radius,
                 spokes,
             ).map((point, j) => {
                 return{
                     ...point, 
-                    value: this.point_value_LUT[value_type](j,spokes, value_offset)
+                    value: this.point_value_LUT[value_type]((j + value_offset) % spokes,spokes)
                 }
             });
+            // points = arrayRotate(points,value_offset)
+            console.log(points)
             this.rings.push({
                 index: i,
                 origin: origins[i],
@@ -105,8 +108,10 @@ export class RingGroup{
                     this.graphic.stroke(color);
                     this.graphic.point(p.x,p.y);
                 })
-                if(params.ring_group.draw_origins)
+                if(params.ring_group.draw_origins){
+                    this.graphic.stroke('white');
                     this.graphic.point(ring.origin.x, ring.origin.y);
+                }
             }
         })
     }

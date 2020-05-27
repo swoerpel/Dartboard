@@ -21,7 +21,7 @@ export var params = {
     point:{
       order:['linear'],
       value:{
-        offset: [0],
+        offset: [-1,0,1],
         scale: 1,
         domain: 31
       },
@@ -32,7 +32,8 @@ export var params = {
   },
 
   weave:{
-    pattern: [0,1,2]
+    pattern: [0,1,2],
+    stroke_weight: 10
   },
 
 

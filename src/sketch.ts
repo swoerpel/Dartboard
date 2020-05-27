@@ -40,6 +40,8 @@ var sketch = function (p: p5) {
   function drawWeave(){
     let path: Point[] = [];
     let pause_sum = 0;
+    graphic.noFill();
+    graphic.strokeWeight(params.weave.stroke_weight)
     graphic.beginShape();
     params.weave.pattern.forEach((i)=>{
       const next_jump = ring_group.jump(i);
