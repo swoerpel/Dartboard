@@ -1,7 +1,8 @@
-let len = 2400;
+let len = 4800;
+let rings = 120;
 export var params = {
   canvas: {
-    width: len*1.5,
+    width: len,
     height:len,
   },
 
@@ -11,17 +12,18 @@ export var params = {
   },
 
   ring_group:{
-    layout: 'linear',
+    layout: 'concentric',
     draw_origins: true,
-    count: 5,
-    stroke_weight:[0.03], 
-    spokes: [6], 
-    radius:[0.15],    
+    count: rings,
+    stroke_weight:[0.005], 
+    spokes: Array.from(Array(rings).keys()).map((n) => n + 2), 
+    // radius:[0.1,.11,.12,.13,.14,.15,.16,.17,.18,.19,.2,.21],    
+    radius: Array.from(Array(rings).keys()).map((n) => n / rings),
     draw:[true],
     point:{
       order:['linear'],
       value:{
-        offset: [0,2,4,6],
+        offset: [0],
         scale: 1,
         domain: 31
       },
@@ -29,7 +31,7 @@ export var params = {
   },
 
   weave:{
-    pattern: [0,1,2,3,4,],
+    pattern: Array.from(Array(rings).keys()),
     stroke_weight: 10
   },
 
