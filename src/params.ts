@@ -1,5 +1,6 @@
-let len = 4800;
+let len = 2400;
 let rings = 120;
+let auto = Array.from(Array(rings).keys()).map((n) => n + 2)
 export var params = {
   canvas: {
     width: len,
@@ -14,25 +15,30 @@ export var params = {
   ring_group:{
     layout: 'concentric',
     draw_origins: true,
-    count: rings,
-    stroke_weight:[0.005], 
-    spokes: Array.from(Array(rings).keys()).map((n) => n + 2), 
-    // radius:[0.1,.11,.12,.13,.14,.15,.16,.17,.18,.19,.2,.21],    
-    radius: Array.from(Array(rings).keys()).map((n) => n / rings),
+    count: 3,
+    stroke_weight:[0.01], 
+    spokes: [8],
+    radius:[.2,.3,.4],    
     draw:[true],
     point:{
       order:['linear'],
       value:{
         offset: [0],
         scale: 1,
-        domain: 31
+        domain: 32
       },
     },
   },
 
   weave:{
-    pattern: Array.from(Array(rings).keys()),
-    stroke_weight: 10
+    pattern: [0,1,2,3,4,5,6,7],
+    stroke_weight: 10,
+    smooth:{
+      total_iters: 8,
+      init_iter: 0,
+      dist_ratio: .25,
+      lattice: false,
+    }
   },
 
 

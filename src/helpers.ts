@@ -98,7 +98,8 @@ export function getRadialVertices(
   let angle = Math.PI * 2 / vertices
   let points = []
   let orientation = Math.PI / vertices // -> pointy top : 0 -> flat top
-  for (let a = -angle; a <= Math.PI * 2 * (1 - 1 / vertices); a += angle) {
+  rotation = rotation / (Math.PI * 2);
+  for (let a = -angle; a < Math.PI * 2 * (1 - 1 / vertices); a += angle) {
       let sx = origin.x + Math.cos(a + orientation + rotation) * radius;
       let sy = origin.y + Math.sin(a + orientation + rotation) * radius;
       points.push({ x: Round(sx), y: Round(sy) })
@@ -121,7 +122,7 @@ export function arrSum(array){
 }
 
 export function SmoothLine(
-  line, 
+  line:Point[], 
   total_iters, 
   current_iter, 
   dist_ratio,
@@ -130,6 +131,7 @@ export function SmoothLine(
   if(total_iters == current_iter)
     return line;
   else{
+    console.log(line)
     let sm_line = []
     if(lattice)
       sm_line.push(line[0])

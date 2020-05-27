@@ -4,7 +4,7 @@ import * as tome from 'chromotome';
 import {params} from './params'
 import { RingGroup } from './ring_group';
 import { Point } from './models';
-import { sumPointValues } from './helpers';
+import { sumPointValues, SmoothLine } from './helpers';
 
 var sketch = function (p: p5) {
   var pause = false;
@@ -41,29 +41,39 @@ var sketch = function (p: p5) {
   }
 
   function drawWeave(){
-    let path: Point[] = [];
-    let pause_sum = 0;
-    graphic.noFill();
-    graphic.strokeWeight(params.weave.stroke_weight)
-    graphic.beginShape();
+    let next_jumps:Point[] = [];
     for(let i = 0; i < params.ring_group.count; i++){
       const jump_index = params.weave.pattern[i % params.weave.pattern.length]
-      const next_jump = ring_group.jump(jump_index);
-      if(next_jump){
-        pause_sum += next_jump.value;
+      next_jumps.push(ring_group.jump(jump_index));
+    }
+    const pause_sum = sumPointValues(next_jumps);
+    if(pause_sum == -params.weave.pattern.length){
+      pause = true;
+      setupRingGroup();
+    }else{
+      console.log(params.weave)
+      next_jumps = SmoothLine(
+        [...next_jumps],
+        params.weave.smooth.total_iters,
+        params.weave.smooth.init_iter,
+        params.weave.smooth.dist_ratio,
+        params.weave.smooth.lattice,
+      )
+      console.log('next_jumps',next_jumps)
+      graphic.noFill();
+      // graphic.fill('lightblue')
+      graphic.strokeWeight(params.weave.stroke_weight)
+      graphic.beginShape();
+      next_jumps.forEach((next_jump)=>{
+        // if(next_jump.value != -1){
         graphic.vertex(
           next_jump.x,
           next_jump.y
         );
-        path.push(next_jump)
-      }
+        // }
+      })
+      graphic.endShape(p.CLOSE);
     }
-    graphic.endShape();
-    if(pause_sum == -params.weave.pattern.length){
-      pause = true;
-      setupRingGroup();
-    }
-
   }
 
   function setupColors(){

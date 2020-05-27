@@ -6,6 +6,8 @@ import { POINT_CONVERSION_COMPRESSED } from "constants";
 export class RingGroup{
 
     private rings: RingParams[] = [];
+    private first_jump: boolean;
+
     private origin_layout_LUT = {
         'concentric': ():Point[] => {
             return new Array(params.ring_group.count)
@@ -51,6 +53,7 @@ export class RingGroup{
 
     setup(){
         this.rings = [];
+        this.first_jump = true;
         const origins = this.origin_layout_LUT[params.ring_group.layout]();
         for(let i = 0; i < params.ring_group.count; i++){
             const radius = params.ring_group.radius[i % params.ring_group.radius.length] * params.canvas.height
@@ -61,14 +64,18 @@ export class RingGroup{
                 origins[i],
                 radius,
                 spokes,
-            ).map((point, j) => {
+                value_offset
+            )
+            console.log('pointspre->',points)
+            points = points.map((point, j) => {
                 return{
                     ...point, 
                     value: this.point_value_LUT[value_type](
-                        (j + value_offset) % spokes,spokes
+                        (j + value_offset) ,spokes
                     )
                 }
             });
+            console.log('pointspost->', points)
             this.rings.push({
                 index: i,
                 origin: origins[i],
