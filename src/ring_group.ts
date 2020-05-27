@@ -1,6 +1,6 @@
 import { Point, RingParams } from "./models";
 import { params } from "./params";
-import { getRadialVertices, maxPoint, minPoint, arrayRotate } from "./helpers";
+import { getRadialVertices, maxPoint, minPoint, arrayRotate, minMaxPoint } from "./helpers";
 import { POINT_CONVERSION_COMPRESSED } from "constants";
 
 export class RingGroup{
@@ -44,34 +44,19 @@ export class RingGroup{
             )
     }
 
-    private jump_rule_LUT = {
-        'max':(ring_index: number): Point => {
-            let point = maxPoint(this.rings[ring_index].points).max_point;
-            const p = JSON.parse(JSON.stringify(point));
-            point.value = -1;
-            return p;
-        },
-        'min':(ring_index: number): Point => {
-            let point = minPoint(this.rings[ring_index].points).min_point;
-            const p = JSON.parse(JSON.stringify(point));
-            point.value = 100000;
-            return p;
-        },
-
-    }
-
     constructor(
         private graphic,
-        private color_machine){}
+        private color_machine
+    ){}
 
-      setup(){
+    setup(){
+        this.rings = [];
         const origins = this.origin_layout_LUT[params.ring_group.layout]();
         for(let i = 0; i < params.ring_group.count; i++){
             const radius = params.ring_group.radius[i % params.ring_group.radius.length] * params.canvas.height
             const spokes = params.ring_group.spokes[i % params.ring_group.spokes.length]
             const value_type = params.ring_group.point.order[i % params.ring_group.point.order.length];
             const value_offset = params.ring_group.point.value.offset[i % params.ring_group.point.value.offset.length]
-            console.log('value_offset',value_offset)
             let points = getRadialVertices(
                 origins[i],
                 radius,
@@ -79,11 +64,11 @@ export class RingGroup{
             ).map((point, j) => {
                 return{
                     ...point, 
-                    value: this.point_value_LUT[value_type]((j + value_offset) % spokes,spokes)
+                    value: this.point_value_LUT[value_type](
+                        (j + value_offset) % spokes,spokes
+                    )
                 }
             });
-            // points = arrayRotate(points,value_offset)
-            console.log(points)
             this.rings.push({
                 index: i,
                 origin: origins[i],
@@ -95,7 +80,7 @@ export class RingGroup{
             })
         }
         console.log('rings ->',this.rings)
-      }
+    }
 
     draw(){
         this.rings.forEach((ring: RingParams, i) =>{
@@ -117,10 +102,10 @@ export class RingGroup{
     }
 
     jump(ring_index): Point{
-        const rule = params.ring_group.jump.rule;
-        return this.jump_rule_LUT[rule](ring_index);
+        const extrema = minMaxPoint(this.rings[ring_index].points);
+        const temp_point = {...extrema.max_point};
+        extrema.max_point.value = -1;
+        return temp_point;
     }
-
-
     
 }

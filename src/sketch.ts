@@ -20,11 +20,14 @@ var sketch = function (p: p5) {
   p.setup = function () {
     setupColors();
     setupGraphics();
+    setupRingGroup();
+
+  }
+
+  var setupRingGroup = function(){
     ring_group = new RingGroup(graphic, color_machine);
     ring_group.setup();
   }
-
-
 
   p.draw = function () {
     if(!pause){
@@ -43,19 +46,23 @@ var sketch = function (p: p5) {
     graphic.noFill();
     graphic.strokeWeight(params.weave.stroke_weight)
     graphic.beginShape();
-    params.weave.pattern.forEach((i)=>{
-      const next_jump = ring_group.jump(i);
-      console.log(next_jump);
-      pause_sum += next_jump.value;
-      graphic.vertex(
-        next_jump.x,
-        next_jump.y
-      );
-      path.push(next_jump)
-    })
+    for(let i = 0; i < params.ring_group.count; i++){
+      const jump_index = params.weave.pattern[i % params.weave.pattern.length]
+      const next_jump = ring_group.jump(jump_index);
+      if(next_jump){
+        pause_sum += next_jump.value;
+        graphic.vertex(
+          next_jump.x,
+          next_jump.y
+        );
+        path.push(next_jump)
+      }
+    }
     graphic.endShape();
-    if(pause_sum == -params.weave.pattern.length)
+    if(pause_sum == -params.weave.pattern.length){
       pause = true;
+      setupRingGroup();
+    }
 
   }
 

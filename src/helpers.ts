@@ -4,6 +4,38 @@ export var Round = (N,acc = 100000) => {
     return Math.round(N * acc) / acc
 }
 
+export var minMaxPoint = (array: Point[]):{
+  min_index: number;
+  max_index: number;
+  min_point: Point;
+  max_point: Point;
+} => {
+  let min = 100000;
+  let max = -100000;
+  let min_index = -1;
+  let max_index = -1;
+  let min_point = null;
+  let max_point = null;
+  array.forEach((point,i)=>{
+    if(point.value > max){
+      max = point.value
+      max_index = i
+      max_point = point
+    }
+    if(point.value < min){
+      min = point.value
+      min_index = i
+      min_point = point
+    }
+  })
+  return{
+    min_index: min_index,
+    max_index: max_index,
+    min_point: min_point,
+    max_point: max_point,
+  }
+}
+
 export var minPoint = (array: Point[]):{
   min_index: number;
   min_point: Point

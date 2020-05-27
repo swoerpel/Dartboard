@@ -1,7 +1,7 @@
 let len = 2400;
 export var params = {
   canvas: {
-    width: len,
+    width: len*1.5,
     height:len,
   },
 
@@ -13,26 +13,23 @@ export var params = {
   ring_group:{
     layout: 'linear',
     draw_origins: true,
-    count: 3,
+    count: 5,
     stroke_weight:[0.03], 
-    spokes: [8,8,8], 
-    radius:[0.1],    
+    spokes: [6], 
+    radius:[0.15],    
     draw:[true],
     point:{
       order:['linear'],
       value:{
-        offset: [-1,0,1],
+        offset: [0,2,4,6],
         scale: 1,
         domain: 31
       },
     },
-    jump:{
-      rule: 'min'
-    }
   },
 
   weave:{
-    pattern: [0,1,2],
+    pattern: [0,1,2,3,4,],
     stroke_weight: 10
   },
 
