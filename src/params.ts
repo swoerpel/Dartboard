@@ -15,15 +15,15 @@ export var params = {
   ring_group:{
     layout: 'concentric',
     draw_origins: true,
-    count: 3,
+    count: 4,
     stroke_weight:[0.01], 
     spokes: [8],
-    radius:[.2,.3,.4],    
+    radius:[.2,.3,.4,.5],    
     draw:[true],
     point:{
       order:['linear'],
       value:{
-        offset: [0],
+        offset: [0,4,0,3],
         scale: 1,
         domain: 32
       },
@@ -31,13 +31,17 @@ export var params = {
   },
 
   weave:{
-    pattern: [0,1,2,3,4,5,6,7],
-    stroke_weight: 10,
+    pattern: [0,1,2,3,4,5],
     smooth:{
       total_iters: 8,
       init_iter: 0,
       dist_ratio: .25,
-      lattice: false,
+      lattice: true,
+    },
+    draw:{
+      fill: false,
+      alpha: 1,
+      stroke_weight: 10,
     }
   },
 

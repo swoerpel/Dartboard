@@ -51,18 +51,22 @@ var sketch = function (p: p5) {
       pause = true;
       setupRingGroup();
     }else{
-      console.log(params.weave)
       next_jumps = SmoothLine(
         [...next_jumps],
         params.weave.smooth.total_iters,
         params.weave.smooth.init_iter,
         params.weave.smooth.dist_ratio,
         params.weave.smooth.lattice,
-      )
-      console.log('next_jumps',next_jumps)
-      graphic.noFill();
-      // graphic.fill('lightblue')
-      graphic.strokeWeight(params.weave.stroke_weight)
+      );
+      graphic.strokeWeight(params.weave.draw.stroke_weight)
+      if(params.weave.draw.fill){
+
+        graphic.fill('lightblue')
+      }
+      else
+        graphic.noFill();
+      
+
       graphic.beginShape();
       next_jumps.forEach((next_jump)=>{
         // if(next_jump.value != -1){

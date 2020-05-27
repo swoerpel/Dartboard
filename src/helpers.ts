@@ -122,7 +122,7 @@ export function arrSum(array){
 }
 
 export function SmoothLine(
-  line:Point[], 
+  line, 
   total_iters, 
   current_iter, 
   dist_ratio,
@@ -131,21 +131,23 @@ export function SmoothLine(
   if(total_iters == current_iter)
     return line;
   else{
-    console.log(line)
     let sm_line = []
     if(lattice)
       sm_line.push(line[0])
     for (let i = 0; i < line.length - 1; i++) {
-      const dif_x = line[i + 1].x - line[i].x;
-      const dif_y = line[i + 1].y - line[i].y;
       let distance = 
-        Math.sqrt(Math.pow(dif_y, 2) + Math.pow(dif_x, 2))
+        Math.sqrt(Math.pow(line[i + 1].x - line[i].x, 2) + 
+        Math.pow(line[i + 1].y - line[i].y, 2))
       let d = distance * dist_ratio;
-      const sub_x = line[i].x + (d / distance) * dif_x
-      const sub_y = line[i].y + (d / distance) * dif_y
-      sm_line.push({x: sub_x,y: sub_y})
+      sm_line.push({
+        x: line[i].x + (d / distance) * (line[i + 1].x - line[i].x),
+        y: line[i].y + (d / distance) * (line[i + 1].y - line[i].y)
+      })
       d = distance * (1 - dist_ratio);
-      sm_line.push({x: sub_x,y: sub_y})
+      sm_line.push({
+        x: line[i].x + (d / distance) * (line[i + 1].x - line[i].x),
+        y: line[i].y + (d / distance) * (line[i + 1].y - line[i].y)
+      })
     }
     if(lattice)
       sm_line.push(line[line.length - 1])
