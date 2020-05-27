@@ -14,23 +14,25 @@ export var params = {
     layout: 'linear',
     draw_origins: true,
     count: 3,
-    stroke_weight:[0.02], 
-    spokes: [8,31,5], 
+    stroke_weight:[0.03], 
+    spokes: [8,8,8], 
     radius:[0.1],    
     draw:[true],
     point:{
-      order:['linear','random'],
+      order:['linear'],
       value:{
-        offset: [0,1,2],
+        offset: [0],
         scale: 1,
         domain: 31
       },
     },
-    
+    jump:{
+      rule: 'min'
+    }
   },
 
   weave:{
-
+    pattern: [0,1,2]
   },
 
 

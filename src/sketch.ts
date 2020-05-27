@@ -3,10 +3,13 @@ import * as chroma from 'chroma.ts';
 import * as tome from 'chromotome';
 import {params} from './params'
 import { RingGroup } from './ring_group';
+import { Point } from './models';
+import { sumPointValues } from './helpers';
 
 var sketch = function (p: p5) {
   var pause = false;
   var auto = false;
+  var draw_weave = false;
   var canvas;
   var graphic;
   var draw_index = 0;
@@ -27,11 +30,31 @@ var sketch = function (p: p5) {
     if(!pause){
       if(params.draw.ring_group)
         ring_group.draw();
-      if(params.draw.weave)
-        
+      if(params.draw.weave && draw_weave)
+        drawWeave();
       p.image(graphic, 0, 0)
       draw_index++;
     }
+  }
+
+  function drawWeave(){
+    let path: Point[] = [];
+    let pause_sum = 0;
+    graphic.beginShape();
+    params.weave.pattern.forEach((i)=>{
+      const next_jump = ring_group.jump(i);
+      console.log(next_jump);
+      pause_sum += next_jump.value;
+      graphic.vertex(
+        next_jump.x,
+        next_jump.y
+      );
+      path.push(next_jump)
+    })
+    graphic.endShape();
+    if(pause_sum == -params.weave.pattern.length)
+      pause = true;
+
   }
 
   function setupColors(){
@@ -77,7 +100,6 @@ var sketch = function (p: p5) {
       case "g": graphic.background(params.color.background); break;
       case "c": randomizeColorMachine(); break;
     }
-    console.log(params.boundary_ring.spokes)
     console.log(event.key)
   }
   

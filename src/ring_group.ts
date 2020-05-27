@@ -1,6 +1,7 @@
 import { Point, RingParams } from "./models";
 import { params } from "./params";
-import { getRadialVertices } from "./helpers";
+import { getRadialVertices, maxPoint, minPoint } from "./helpers";
+import { POINT_CONVERSION_COMPRESSED } from "constants";
 
 export class RingGroup{
 
@@ -43,6 +44,22 @@ export class RingGroup{
             )
     }
 
+    private jump_rule_LUT = {
+        'max':(ring_index: number): Point => {
+            let point = maxPoint(this.rings[ring_index].points).max_point;
+            const p = JSON.parse(JSON.stringify(point));
+            point.value = -1;
+            return p;
+        },
+        'min':(ring_index: number): Point => {
+            let point = minPoint(this.rings[ring_index].points).min_point;
+            const p = JSON.parse(JSON.stringify(point));
+            point.value = 100000;
+            return p;
+        },
+
+    }
+
     constructor(
         private graphic,
         private color_machine){}
@@ -71,16 +88,13 @@ export class RingGroup{
                 draw: params.ring_group.draw[i % params.ring_group.draw.length],
                 stroke_weight: params.ring_group.stroke_weight[i % params.ring_group.stroke_weight.length],
                 points: points,
-                max_value: points.reduce(function(next, max) {
-                    return (next.value > max.value) ? next : max
-                }).value
+                max_value: maxPoint(points).max_point.value,
             })
         }
         console.log('rings ->',this.rings)
       }
 
-
-      draw(){
+    draw(){
         this.rings.forEach((ring: RingParams, i) =>{
             if(ring.draw){
                 this.graphic.strokeWeight(params.canvas.width * ring.stroke_weight)
@@ -95,6 +109,13 @@ export class RingGroup{
                     this.graphic.point(ring.origin.x, ring.origin.y);
             }
         })
-      }
+    }
+
+    jump(ring_index): Point{
+        const rule = params.ring_group.jump.rule;
+        return this.jump_rule_LUT[rule](ring_index);
+    }
+
+
     
 }
