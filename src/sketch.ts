@@ -9,7 +9,6 @@ var sketch = function (p: p5) {
   var jump = false;
   var auto = false;
   var turnaround_flag: boolean = false;
-  var strokeCellTurnaroundFlag: boolean = false;
   var knight_jump_toggle: boolean = false;
   var canvas;
   var graphic;
@@ -35,7 +34,7 @@ var sketch = function (p: p5) {
       JumpKnight();
       if(params.draw.oscillate_smoothing) 
         osscilateSmoothRatio();
-      if(params.draw.oscillate_stroke_cell_ratio) 
+      if(params.draw.oscillate_weave_width) 
         osscilateStrokeCellRatio();
       if(params.draw.toggle_knight_jump)
         modifyJumping();
@@ -78,17 +77,17 @@ var sketch = function (p: p5) {
 
 
   function osscilateStrokeCellRatio(){
-    if (1 / draw_index < params.weave.stroke_cell_oscillation_frequency){
-
+    if (1 / draw_index < params.weave.width.oss_freq){
+      draw_index =0;
       modifyStrokeCellRatio()
     }
   }
 
   function osscilateSmoothRatio(){
-    if (1 / draw_index < params.weave.smooth_oscillation_frequency){
-      if(params.weave.smooth_dist_ratio >= params.weave.smooth_dist_max)
+    if (1 / draw_index < params.weave.smooth.oss_freq){
+      if(params.weave.smooth.ratio >= params.weave.smooth.max)
         turnaround_flag = false;
-      if(params.weave.smooth_dist_ratio <= params.weave.smooth_dist_min)
+      if(params.weave.smooth.ratio <= params.weave.smooth.min)
         turnaround_flag = true;
       modifySmoothRatio(turnaround_flag)
     }
@@ -126,7 +125,8 @@ var sketch = function (p: p5) {
     canvas = p.createCanvas(params.canvas.width, params.canvas.height);
     canvas.background(params.color.background)
     graphic = p.createGraphics(params.canvas.width, params.canvas.height)
-    graphic.strokeJoin(p.BEVEL)
+    // graphic.strokeJoin(p.BEVEL)
+    graphic.strokeJoin(p.ROUND)
   }
 
   p.keyPressed = function (){
@@ -141,6 +141,7 @@ var sketch = function (p: p5) {
       case "ArrowLeft":modifySmoothRatio(false); break;
       case "=": ; modifyMaxGridValue(true); break;
       case "-": modifyMaxGridValue(false); break;
+      case "p": console.log(canvas); break;
     }
     // console.log(event.key)
   }
@@ -153,19 +154,21 @@ var sketch = function (p: p5) {
     // console.log('max grid value ->',params.grid.max_value)
   }
 
-  function modifyStrokeCellRatio(inc){
-    params.weave.stroke_cell_ratio += params.weave.stroke_cell_ratio_inc
-    if(params.weave.stroke_cell_ratio >= params.weave.stroke_cell_ratio_max)
-      params.weave.stroke_cell_ratio = params.weave.stroke_cell_ratio_min
-    // console.log('weave stroke cell ratio',params.weave.stroke_cell_ratio)
+  function modifyStrokeCellRatio(){
+    params.weave.width.value -= params.weave.width.inc
+    if(params.weave.width.value < params.weave.width.min){
+
+      params.weave.width.value = params.weave.width.max
+      pause = true;
+    }
+    // console.log('weave stroke cell ratio',params.weave.width)
   }
 
-  function   modifySmoothRatio(inc){
+  function modifySmoothRatio(inc){
     if(inc)
-      params.weave.smooth_dist_ratio += params.weave.smooth_dist_ratio_inc
+      params.weave.smooth.ratio += params.weave.smooth.inc
     else
-      params.weave.smooth_dist_ratio -= params.weave.smooth_dist_ratio_inc
-    // console.log(params.weave.smooth_dist_ratio)
+      params.weave.smooth.ratio -= params.weave.smooth.inc
   }
   
 }

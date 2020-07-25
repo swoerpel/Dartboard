@@ -13,7 +13,7 @@
   "dependencies": {
     "chroma": "0.0.1",
     "chroma.ts": "^1.0.9",
-    "chromotome": "^1.17.2",
+    "chromotome": "^1.17.3",
     "p5": "^0.10.2"
   },
   "devDependencies": {

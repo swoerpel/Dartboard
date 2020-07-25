@@ -67,7 +67,7 @@ export class Weave{
                 if(params.grid.random)
                     value = Math.floor(Math.random() * params.grid.max_value)                
                 else
-                    value = this.cell_count % params.grid.max_value,
+                    value = this.cell_count % params.grid.max_value;
                 row.push({
                     index: this.cell_count++,
                     value: value,
@@ -108,7 +108,7 @@ export class Weave{
     }
 
     setKnightColors(){
-        this.graphic.strokeWeight(params.knight.stroke_cell_ratio * this.cell_width);
+        this.graphic.strokeWeight(params.knight.width * this.cell_width);
         let cv = arrSum(this.grid.map((row)=> row.map((cell)=>cell.value))) / this.start_grid_sum;
         let col = this.color_machine(cv).rgba();
         col[3] = 255 * params.knight.alpha;
@@ -116,7 +116,7 @@ export class Weave{
         this.graphic.stroke(this.color_machine(1 - cv).hex())
     }
 
-    setWeaveColors(){
+    setWeaveColors(stroke_width_offset = 0){
         let col;
         if(!params.color.const){
             let cv = this.jump_count / params.color.domain;
@@ -127,7 +127,7 @@ export class Weave{
             col = chroma.color(col).rgba()
         }
         col[3] = params.weave.alpha * 255;
-        this.graphic.strokeWeight(params.weave.stroke_cell_ratio * this.cell_width);
+        this.graphic.strokeWeight(params.weave.width.value * this.cell_width + stroke_width_offset);
         this.graphic.stroke(col);
     }
 
@@ -181,7 +181,6 @@ export class Weave{
     }
     
     drawWeave(){
-        this.setWeaveColors();
         const weave = this.weave_queue.map((cell_index) => {
             return{
                 x: this.grid[cell_index.x][cell_index.y].cx,
@@ -189,13 +188,20 @@ export class Weave{
             }
         })
         this.graphic.noFill();
-        this.graphic.beginShape()
-        SmoothLine(
+        let line = SmoothLine(
             weave,
-            params.weave.smooth_iters,
-            params.weave.smooth_iter_start,
-            params.weave.smooth_dist_ratio,   
-        ).forEach((v)=>this.graphic.vertex(v.x,v.y));
+            params.weave.smooth.iters,
+            params.weave.smooth.iter_start,
+            params.weave.smooth.ratio,   
+        );
+        this.setWeaveColors(params.weave.outline.width);
+        this.graphic.stroke(params.weave.outline.color);
+        this.graphic.beginShape()
+        line.forEach((v)=>this.graphic.vertex(v.x,v.y));
+        this.graphic.endShape();
+        this.setWeaveColors();
+        this.graphic.beginShape()
+        line.forEach((v)=>this.graphic.vertex(v.x,v.y));
         this.graphic.endShape();
     }
 
@@ -250,7 +256,6 @@ export class Weave{
                 
             }
         })
-        // console.log('options',options)
         options = options.filter((o)=>o.value != -1)
         return options
     }
