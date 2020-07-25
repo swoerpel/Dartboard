@@ -13,7 +13,9 @@ var sketch = function (p: p5) {
   var canvas;
   var graphic;
   var weave: Weave;
-  var draw_index = 0;
+  var jump_toggle_index = 0;
+  var weave_width_index = 0;
+  var weave_ratio_index = 0;
   var color_machine;
   
   var color_palettes = {};
@@ -35,12 +37,14 @@ var sketch = function (p: p5) {
       if(params.draw.oscillate_smoothing) 
         osscilateSmoothRatio();
       if(params.draw.oscillate_weave_width) 
-        osscilateStrokeCellRatio();
+        osscilateWeaveWidth();
       if(params.draw.toggle_knight_jump)
         modifyJumping();
 
       p.image(graphic, 0, 0)
-      draw_index++;
+      jump_toggle_index++;
+      weave_ratio_index++;
+      weave_width_index++;
     }
   }
 
@@ -69,27 +73,40 @@ var sketch = function (p: p5) {
       params.knight.jump.x = params.knight.jump.min_x
       params.knight.jump.y = params.knight.jump.min_y
     }
-    if(1/draw_index < params.knight.toggle_jump_frequency){
+    if(1 / jump_toggle_index < params.knight.toggle_jump_frequency){
       console.log("jump toggle")
+      jump_toggle_index = 0;
       knight_jump_toggle = !knight_jump_toggle;
     }
   }
 
 
-  function osscilateStrokeCellRatio(){
-    if (1 / draw_index < params.weave.width.oss_freq){
-      draw_index =0;
-      modifyStrokeCellRatio()
+  function osscilateWeaveWidth(){
+    if (1 / weave_width_index < params.weave.width.oss_freq){
+      weave_width_index = 0;
+      params.weave.width.value -= params.weave.width.inc
+      if(params.weave.width.value < params.weave.width.min){
+        params.weave.width.value = params.weave.width.max
+        // pause = true;
+      }
     }
   }
 
   function osscilateSmoothRatio(){
-    if (1 / draw_index < params.weave.smooth.oss_freq){
-      if(params.weave.smooth.ratio >= params.weave.smooth.max)
+    if (1 / weave_ratio_index < params.weave.smooth.oss_freq){
+      if(params.weave.smooth.ratio >= params.weave.smooth.max){
         turnaround_flag = false;
-      if(params.weave.smooth.ratio <= params.weave.smooth.min)
+      }
+      if(params.weave.smooth.ratio <= params.weave.smooth.min){
         turnaround_flag = true;
-      modifySmoothRatio(turnaround_flag)
+      }
+      if(turnaround_flag){
+        params.weave.smooth.ratio += params.weave.smooth.inc
+      }else{
+        params.weave.smooth.ratio -= params.weave.smooth.inc
+      }
+      
+      weave_ratio_index = 0;
     }
   }
 
@@ -125,8 +142,8 @@ var sketch = function (p: p5) {
     canvas = p.createCanvas(params.canvas.width, params.canvas.height);
     canvas.background(params.color.background)
     graphic = p.createGraphics(params.canvas.width, params.canvas.height)
-    // graphic.strokeJoin(p.BEVEL)
     graphic.strokeJoin(p.ROUND)
+    // graphic.strokeJoin(p.MITER)
   }
 
   p.keyPressed = function (){
@@ -137,8 +154,6 @@ var sketch = function (p: p5) {
       case "g": graphic.background(params.color.background); break;
       case "r": setupWeave(); break;
       case "c": randomizeColorMachine(); break;
-      case "ArrowRight":modifySmoothRatio(true); break;
-      case "ArrowLeft":modifySmoothRatio(false); break;
       case "=": ; modifyMaxGridValue(true); break;
       case "-": modifyMaxGridValue(false); break;
       case "p": console.log(canvas); break;
@@ -152,23 +167,6 @@ var sketch = function (p: p5) {
     else
       params.grid.max_value -= params.grid.max_value_inc
     // console.log('max grid value ->',params.grid.max_value)
-  }
-
-  function modifyStrokeCellRatio(){
-    params.weave.width.value -= params.weave.width.inc
-    if(params.weave.width.value < params.weave.width.min){
-
-      params.weave.width.value = params.weave.width.max
-      pause = true;
-    }
-    // console.log('weave stroke cell ratio',params.weave.width)
-  }
-
-  function modifySmoothRatio(inc){
-    if(inc)
-      params.weave.smooth.ratio += params.weave.smooth.inc
-    else
-      params.weave.smooth.ratio -= params.weave.smooth.inc
   }
   
 }

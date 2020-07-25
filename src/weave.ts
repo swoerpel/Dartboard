@@ -194,11 +194,13 @@ export class Weave{
             params.weave.smooth.iter_start,
             params.weave.smooth.ratio,   
         );
-        this.setWeaveColors(params.weave.outline.width);
-        this.graphic.stroke(params.weave.outline.color);
-        this.graphic.beginShape()
-        line.forEach((v)=>this.graphic.vertex(v.x,v.y));
-        this.graphic.endShape();
+        if(params.weave.outline.width != 0){
+            this.setWeaveColors(params.weave.outline.width);
+            this.graphic.stroke(params.weave.outline.color);
+            this.graphic.beginShape()
+            line.forEach((v)=>this.graphic.vertex(v.x,v.y));
+            this.graphic.endShape();
+        }
         this.setWeaveColors();
         this.graphic.beginShape()
         line.forEach((v)=>this.graphic.vertex(v.x,v.y));

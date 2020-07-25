@@ -1,4 +1,4 @@
-let len = 2400;
+let len = 4800;
 export var params = {
   canvas: {
     width: len * 2,
@@ -6,11 +6,11 @@ export var params = {
   },
 
   grid:{
-    cols:8,
-    rows: 4,
+    cols:12 * 2,
+    rows: 12,
     max_value: 9,
     max_value_inc: 1,
-    random: true, // cell assignment values are random
+    random: false, // cell assignment values are random
   },
 
   draw:{
@@ -18,11 +18,10 @@ export var params = {
     weave: true,
     jump_options: false,
     pause_on_trap: false,
-    inc_max_grid_value_on_trap: false,
-    oscillate_smoothing: false,
+    inc_max_grid_value_on_trap: true,
+    oscillate_smoothing: true,
     oscillate_weave_width: true,
     toggle_knight_jump: false,
-    
   },
 
   knight:{
@@ -32,8 +31,8 @@ export var params = {
       y: 1,
 
       // only toggle knight jump on
-      min_x: 2,
-      min_y: 1,
+      min_x: 3,
+      min_y: 3,
 
       max_x: 4,
       max_y: 4,
@@ -46,29 +45,29 @@ export var params = {
   },
 
   weave:{
-    queue_length: 5,
+    queue_length: 8,
     alpha: 1,
 
     smooth: {
-      oss_freq: 0.25,
       iter_start: 0,
-      iters: 8,
+      iters: 5,
       ratio: 0.25,
-      min: 0,
-      max: .25,
-      inc: 0.05
+      min: .25,
+      max: 1,
+      inc: 0.01,
+      oss_freq: 0.05,
     },
 
     width: {
-      value: .1,
-      min: .1,
-      max: .9,
-      inc: .1,
+      value: .2,
+      min: .2,
+      max: .8,
+      inc: .2,
       oss_freq: 0.05,
     },
 
     outline: {
-      width: 4,
+      width: 10,
       color: 'black',
     },
 
@@ -83,16 +82,16 @@ export var params = {
   color: {
     const: false,
     const_color: 'white',
-    palette: 'hilda02',
+    // palette: 'hilda02',
     // palette: 'tundra4',
     // palette: 'winter-night',
-    // palette: 'cc232',
+    palette: 'cc232',
     // palette: 'RdBu',
     // palette: 'Viridis',
     // palette: 'Spectral',
     // palette: 'lemon_citrus',
     // palette: ['black','red','yellow','blue'],
-    domain: 20,
+    domain: 12,
     background:'black',
   }
 
