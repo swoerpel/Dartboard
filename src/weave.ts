@@ -19,20 +19,18 @@ export class Weave{
     jump_count: number = 0;
     cell_count: number = 0;
 
-    knightStartLUT = {
-        'center':  {
-            x: Math.floor(params.grid.cols / 2),
-            y: Math.floor(params.grid.rows / 2)
-        },
-        'start':  {
-            x: 0,
-            y: 0
-        },
-    }
 
-    knight_x: number = this.knightStartLUT[params.knight.start].x;
-    knight_y: number = this.knightStartLUT[params.knight.start].y;
-    weave_queue = new Array(params.weave.queue_length).fill({x:this.knight_x,y:this.knight_y});
+    public knightStartCorners = [
+        {x:0,y:0},
+        {x:params.grid.rows - 1,y:0},
+        {x:params.grid.rows - 1,y:params.grid.cols - 1},
+        {x:0,y:params.grid.cols - 1}
+    ]
+
+
+    knight_x: number = this.knightStartCorners[0].x;
+    knight_y: number = this.knightStartCorners[0].y;
+    weave_queue: {x:number,y:number}[];
     knight_jump_offsets: {x:number;y:number}[] = [];
 
     constructor(
@@ -41,9 +39,10 @@ export class Weave{
     ){}
 
 
-    RefreshKnight(){
-        this.knight_x = this.knightStartLUT[params.knight.start].x;
-        this.knight_y = this.knightStartLUT[params.knight.start].y;
+
+    RefreshKnight(start_index){
+        this.knight_x = this.knightStartCorners[start_index].x;
+        this.knight_y = this.knightStartCorners[start_index].y;
         for(let i = 0; i < 4; i++){
             const muls = Array.from(i.toString(2).padStart(2,'0')).map((m) => parseInt(m));
             const x_mul = muls[0] ? -1 : 1;
@@ -54,6 +53,10 @@ export class Weave{
             this.knight_jump_offsets.push({x:y,y:x});
         }
         // console.log('this.knight_jump_offsets',this.knight_jump_offsets)
+    }
+
+    RefreshQueue(){
+        this.weave_queue = new Array(params.weave.queue_length).fill({x:this.knight_x,y:this.knight_y});
     }
 
     RefreshGrid(){

@@ -1,16 +1,16 @@
 let len = 4800;
 export var params = {
   canvas: {
-    width: len * 2,
+    width: len,
     height:len,
   },
 
   grid:{
-    cols:12 * 2,
-    rows: 12,
+    cols:32,
+    rows: 32,
     max_value: 9,
     max_value_inc: 1,
-    random: false, // cell assignment values are random
+    random: true, // cell assignment values are random
   },
 
   draw:{
@@ -19,23 +19,23 @@ export var params = {
     jump_options: false,
     pause_on_trap: false,
     inc_max_grid_value_on_trap: true,
-    oscillate_smoothing: true,
+    oscillate_smoothing: false,
     oscillate_weave_width: true,
-    toggle_knight_jump: false,
+    toggle_knight_jump: true,
+    toggle_knight_corners: true,
   },
 
   knight:{
-    start:'start',
     jump:{
       x: 1,
       y: 1,
 
       // only toggle knight jump on
-      min_x: 3,
-      min_y: 3,
+      min_x: 1,
+      min_y: 1,
 
-      max_x: 4,
-      max_y: 4,
+      max_x: 2,
+      max_y: 2,
     },
     toggle_jump_frequency: 0.01,
     alpha: .1,
@@ -45,13 +45,13 @@ export var params = {
   },
 
   weave:{
-    queue_length: 8,
+    queue_length: 12,
     alpha: 1,
 
     smooth: {
       iter_start: 0,
       iters: 5,
-      ratio: 0.25,
+      ratio: .25,
       min: .25,
       max: 1,
       inc: 0.01,
@@ -61,13 +61,13 @@ export var params = {
     width: {
       value: .2,
       min: .2,
-      max: .8,
-      inc: .2,
-      oss_freq: 0.05,
+      max: 1,
+      inc: .1,
+      oss_freq: 0.02,
     },
 
     outline: {
-      width: 10,
+      width: 20,
       color: 'black',
     },
 
@@ -83,15 +83,15 @@ export var params = {
     const: false,
     const_color: 'white',
     // palette: 'hilda02',
-    // palette: 'tundra4',
+    palette: 'tundra4',
     // palette: 'winter-night',
-    palette: 'cc232',
+    // palette: 'cc232',
     // palette: 'RdBu',
     // palette: 'Viridis',
     // palette: 'Spectral',
     // palette: 'lemon_citrus',
     // palette: ['black','red','yellow','blue'],
-    domain: 12,
+    domain: 6,
     background:'black',
   }
 

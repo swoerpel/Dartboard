@@ -16,6 +16,7 @@ var sketch = function (p: p5) {
   var jump_toggle_index = 0;
   var weave_width_index = 0;
   var weave_ratio_index = 0;
+  var weave_corner_index = 0;
   var color_machine;
   
   var color_palettes = {};
@@ -27,7 +28,8 @@ var sketch = function (p: p5) {
 
   function setupWeave(){
     weave = new Weave(graphic, color_machine);
-    weave.RefreshKnight();
+    weave.RefreshKnight(weave_corner_index);
+    weave.RefreshQueue();
     weave.RefreshGrid();
   }
 
@@ -53,12 +55,15 @@ var sketch = function (p: p5) {
       if(!weave.Jump()){
         console.log("knight trapped")
         weave.RefreshGrid();
-        if(params.draw.pause_on_trap)
+        if(params.draw.pause_on_trap){
           pause = true;
+        }
+        if(params.draw.toggle_knight_corners){
+          weave_corner_index = (weave_corner_index + 1) % weave.knightStartCorners.length
+        }
         if(params.draw.inc_max_grid_value_on_trap){
           modifyMaxGridValue(true);
           setupWeave();
-          
         }
       }
       jump = false;
@@ -87,6 +92,8 @@ var sketch = function (p: p5) {
       params.weave.width.value -= params.weave.width.inc
       if(params.weave.width.value < params.weave.width.min){
         params.weave.width.value = params.weave.width.max
+        pause = true
+
         // pause = true;
       }
     }
