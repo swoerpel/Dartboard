@@ -1,16 +1,15 @@
 let len = 4800;
 export var params = {
   canvas: {
-    width: len,
+    width: len*2,
     height:len,
   },
 
   grid:{
-    cols:32,
-    rows: 32,
-    max_value: 9,
+    cols:20*2,
+    rows: 20,
+    max_value: 6,
     max_value_inc: 1,
-    random: true, // cell assignment values are random
   },
 
   draw:{
@@ -18,16 +17,16 @@ export var params = {
     weave: true,
     jump_options: false,
     pause_on_trap: false,
-    inc_max_grid_value_on_trap: true,
+    inc_max_grid_value_on_trap: false,
     oscillate_smoothing: false,
     oscillate_weave_width: true,
-    toggle_knight_jump: true,
+    toggle_knight_jump: false,
     toggle_knight_corners: true,
   },
 
   knight:{
     jump:{
-      x: 1,
+      x: 2,
       y: 1,
 
       // only toggle knight jump on
@@ -67,7 +66,7 @@ export var params = {
     },
 
     outline: {
-      width: 20,
+      width: 16,
       color: 'black',
     },
 
@@ -82,8 +81,8 @@ export var params = {
   color: {
     const: false,
     const_color: 'white',
-    // palette: 'hilda02',
-    palette: 'tundra4',
+    palette: 'hilda02',
+    // palette: 'tundra4',
     // palette: 'winter-night',
     // palette: 'cc232',
     // palette: 'RdBu',

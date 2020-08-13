@@ -1,6 +1,7 @@
 import {params} from './params'
 import { SmoothLine, arrSum } from './helpers';
 import * as chroma from 'chroma.ts';
+import { GridMachine } from './grid_machine';
 
 export interface Cell{
     value: number;
@@ -10,7 +11,7 @@ export interface Cell{
     cy:number;
 }
 
-export class Weave{
+export class Weave {
     grid: Cell[][] = [];
     grid_sum: number; 
     start_grid_sum: number;
@@ -19,6 +20,7 @@ export class Weave{
     jump_count: number = 0;
     cell_count: number = 0;
 
+    grid_machine: GridMachine;
 
     public knightStartCorners = [
         {x:0,y:0},
@@ -36,7 +38,9 @@ export class Weave{
     constructor(
         public graphic, 
         public color_machine,
-    ){}
+    ){
+        this.grid_machine = new GridMachine();
+    }
 
 
 
@@ -62,15 +66,10 @@ export class Weave{
     RefreshGrid(){
         this.grid = []
         this.cell_count = 0;
-
         for(let i = 0; i < params.grid.cols; i++){
             let row = [];
             for(let j = 0; j < params.grid.rows; j++){
-                let value;
-                if(params.grid.random)
-                    value = Math.floor(Math.random() * params.grid.max_value)                
-                else
-                    value = this.cell_count % params.grid.max_value;
+                let value = this.grid_machine.generate(this.cell_count,i,j,params.grid);
                 row.push({
                     index: this.cell_count++,
                     value: value,
@@ -85,6 +84,9 @@ export class Weave{
         this.start_grid_sum = arrSum(this.grid.map((row)=> row.map((cell)=>cell.value)))
         // this.grid.forEach((row) =>row.forEach((cell)=>console.log(cell)));
     }
+
+
+
 
     Jump(){
         const options = this.calculateNext()
