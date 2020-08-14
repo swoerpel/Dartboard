@@ -1,4 +1,4 @@
-let len = 4800;
+let len = 2400;
 export var params = {
   canvas: {
     width: len*2,
@@ -6,8 +6,8 @@ export var params = {
   },
 
   grid:{
-    cols:20*2,
-    rows: 20,
+    cols:8 * 2,
+    rows: 8,
     max_value: 6,
     max_value_inc: 1,
   },
@@ -17,16 +17,19 @@ export var params = {
     weave: true,
     jump_options: false,
     pause_on_trap: false,
-    inc_max_grid_value_on_trap: false,
+    pause_on_min_weave_width: true,
+    inc_max_grid_value_on_trap: true,
     oscillate_smoothing: false,
     oscillate_weave_width: true,
+    oscillate_weave_step: true,
     toggle_knight_jump: false,
     toggle_knight_corners: true,
+     
   },
 
   knight:{
     jump:{
-      x: 2,
+      x: 1,
       y: 1,
 
       // only toggle knight jump on
@@ -44,7 +47,7 @@ export var params = {
   },
 
   weave:{
-    queue_length: 12,
+    queue_length: 8,
     alpha: 1,
 
     smooth: {
@@ -60,9 +63,14 @@ export var params = {
     width: {
       value: .2,
       min: .2,
-      max: 1,
+      max: .8,
       inc: .1,
       oss_freq: 0.02,
+    },
+
+    step: {
+      low: 1,
+      high: 6,
     },
 
     outline: {
@@ -90,7 +98,7 @@ export var params = {
     // palette: 'Spectral',
     // palette: 'lemon_citrus',
     // palette: ['black','red','yellow','blue'],
-    domain: 6,
+    domain: 12,
     background:'black',
   }
 

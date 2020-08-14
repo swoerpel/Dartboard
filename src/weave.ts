@@ -2,6 +2,7 @@ import {params} from './params'
 import { SmoothLine, arrSum } from './helpers';
 import * as chroma from 'chroma.ts';
 import { GridMachine } from './grid_machine';
+import { _GridMachine } from './grid_machine_';
 
 export interface Cell{
     value: number;
@@ -21,12 +22,12 @@ export class Weave {
     cell_count: number = 0;
 
     grid_machine: GridMachine;
-
+    _grid_machine: _GridMachine;
     public knightStartCorners = [
         {x:0,y:0},
-        {x:params.grid.rows - 1,y:0},
-        {x:params.grid.rows - 1,y:params.grid.cols - 1},
-        {x:0,y:params.grid.cols - 1}
+        {x:0,y:params.grid.rows - 1},
+        {x:params.grid.cols - 1,y:params.grid.rows - 1},
+        {x:params.grid.cols - 1,y:0}
     ]
 
 
@@ -40,6 +41,7 @@ export class Weave {
         public color_machine,
     ){
         this.grid_machine = new GridMachine();
+        this._grid_machine = new _GridMachine(params.grid.cols,params.grid.rows);
     }
 
 
@@ -66,10 +68,16 @@ export class Weave {
     RefreshGrid(){
         this.grid = []
         this.cell_count = 0;
+        // let value_grid = this._grid_machine.orderedSequenceGrid(params.grid.max_value);
+        // let value_grid = this._grid_machine.orderedDomainGrid(params.grid.max_value);
+        let value_grid = this._grid_machine.stripeGrid(params.grid.max_value);
+        console.log('value_grid',value_grid)
         for(let i = 0; i < params.grid.cols; i++){
             let row = [];
             for(let j = 0; j < params.grid.rows; j++){
-                let value = this.grid_machine.generate(this.cell_count,i,j,params.grid);
+
+                let value = value_grid[i][j].value;
+                // let value = this.grid_machine.generate(this.cell_count,i,j,params.grid);
                 row.push({
                     index: this.cell_count++,
                     value: value,
@@ -98,7 +106,7 @@ export class Weave {
             this.drawOptions(options);
         if(params.draw.knight)
             this.drawKnight();
-        if(params.draw.weave)
+        if(params.draw.weave && this.jump_count % 2 == 0)
             this.drawWeave();
         
         this.rotateWeaveQueue()

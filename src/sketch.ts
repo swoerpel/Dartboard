@@ -5,21 +5,30 @@ import {params} from './params'
 import { Weave } from './weave';
 
 var sketch = function (p: p5) {
-  var pause = false;
-  var jump = false;
-  var auto = false;
-  var turnaround_flag: boolean = false;
-  var knight_jump_toggle: boolean = false;
+  // core data
   var canvas;
   var graphic;
   var weave: Weave;
+  var color_machine;
+  var color_palettes = {};
+
+  // control index values
   var jump_toggle_index = 0;
   var weave_width_index = 0;
   var weave_ratio_index = 0;
   var weave_corner_index = 0;
-  var color_machine;
+  var weave_step_oscillate_value = 0;
+
+  // toggle flags
+  var turnaround_flag: boolean = false;
+  var knight_jump_toggle: boolean = false;
+  var weave_step_oscillate_toggle: boolean = true;
+
+  //keyboard input flags
+  var pause = false;
+  var jump = false;
+  var auto = false;
   
-  var color_palettes = {};
   p.setup = function () {
     setupColors();
     setupGraphics();
@@ -52,7 +61,7 @@ var sketch = function (p: p5) {
 
   function JumpKnight(){
     if(auto || jump){
-      if(!weave.Jump()){
+      if(!weave.Jump(calculateWeaveStep())){
         console.log("knight trapped")
         // weave.RefreshGrid();
         if(params.draw.pause_on_trap){
@@ -68,6 +77,31 @@ var sketch = function (p: p5) {
       }
       jump = false;
     }
+  }
+
+  function calculateWeaveStep(){
+    if(params.draw.oscillate_weave_step){
+      let draw_weave = false;
+      if(weave_step_oscillate_value === 0){
+        draw_weave = true;
+      }
+      weave_step_oscillate_value++;
+      if(weave_step_oscillate_toggle){
+        // low value
+        if(weave_step_oscillate_value % params.weave.step.low == 0){
+          weave_step_oscillate_toggle = !weave_step_oscillate_value;
+          weave_step_oscillate_value = 0;
+        }
+      }else {
+        // high value
+        if(weave_step_oscillate_value % params.weave.step.high == 0){
+          weave_step_oscillate_toggle = !weave_step_oscillate_value;
+          weave_step_oscillate_value = 0;
+        }
+      }
+      return draw_weave;
+    }
+    return true;
   }
 
   function modifyJumping(){
@@ -92,7 +126,9 @@ var sketch = function (p: p5) {
       params.weave.width.value -= params.weave.width.inc
       if(params.weave.width.value < params.weave.width.min){
         params.weave.width.value = params.weave.width.max
-        // pause = true;
+        if(params.draw.pause_on_min_weave_width){
+          pause = true;
+        }
       }
     }
   }
@@ -110,11 +146,9 @@ var sketch = function (p: p5) {
       }else{
         params.weave.smooth.ratio -= params.weave.smooth.inc
       }
-      
       weave_ratio_index = 0;
     }
   }
-
 
   function setupColors(){
     let chromotome_palettes = tome.getAll();
