@@ -71,7 +71,6 @@ export class Weave {
         // let value_grid = this._grid_machine.orderedSequenceGrid(params.grid.max_value);
         // let value_grid = this._grid_machine.orderedDomainGrid(params.grid.max_value);
         let value_grid = this._grid_machine.stripeGrid(params.grid.max_value);
-        console.log('value_grid',value_grid)
         for(let i = 0; i < params.grid.cols; i++){
             let row = [];
             for(let j = 0; j < params.grid.rows; j++){
@@ -96,7 +95,7 @@ export class Weave {
 
 
 
-    Jump(){
+    Jump(weave_step){
         const options = this.calculateNext()
         if(options.length == 0){
             this.jump_count = 0;
@@ -106,8 +105,8 @@ export class Weave {
             this.drawOptions(options);
         if(params.draw.knight)
             this.drawKnight();
-        if(params.draw.weave && this.jump_count % 2 == 0)
-            this.drawWeave();
+        if(params.draw.weave && weave_step)
+            this.drawWeave(); 
         
         this.rotateWeaveQueue()
 
@@ -115,7 +114,7 @@ export class Weave {
         this.knight_x = options[next_jump_index].x
         this.knight_y = options[next_jump_index].y
         this.grid[this.knight_x][this.knight_y].value = -1;
-        this.jump_count = (this.jump_count + 1) % params.color.domain;
+        this.jump_count = this.jump_count + 1
         // this.printWeaveQueue()
         return true;
     }
@@ -129,16 +128,31 @@ export class Weave {
         this.graphic.stroke(this.color_machine(1 - cv).hex())
     }
 
+    // called on every draw
     setWeaveColors(stroke_width_offset = 0){
         let col;
-        if(!params.color.const){
-            let cv = this.jump_count / params.color.domain;
-            col = this.color_machine(cv).rgba()
-        }
-        else{
+        if(params.weave.color_mode === 'const'){
             col = params.color.const_color
             col = chroma.color(col).rgba()
+        }else if(params.weave.color_mode === 'step'){
+            let cv = (this.jump_count % params.weave.color_domain) / params.weave.color_domain;
+            col = this.color_machine(cv).rgba()
+        }else if(params.weave.color_mode === 'horizontal'){
+            let cv = this.weave_queue[0].x / params.grid.cols;
+            col = this.color_machine(cv).rgba()
+        }else if(params.weave.color_mode === 'vertical'){
+            let cv = this.weave_queue[0].y / params.grid.rows;
+            col = this.color_machine(cv).rgba()
         }
+
+        // if(!params.color.const){
+        //     let cv = (this.jump_count % params.weave.color_domain) / params.weave.color_domain;
+        //     col = this.color_machine(cv).rgba()
+        // }
+        // else{
+        //     col = params.color.const_color
+        //     col = chroma.color(col).rgba()
+        // }
         col[3] = params.weave.alpha * 255;
         this.graphic.strokeWeight(params.weave.width.value * this.cell_width + stroke_width_offset);
         this.graphic.stroke(col);
@@ -147,7 +161,7 @@ export class Weave {
     setOptionsColors(){
         this.graphic.strokeWeight(0);
         // this.graphic.fill(params.weave.stroke_weight);
-        let cv = this.jump_count / params.color.domain;
+        let cv = (this.jump_count % params.jump_options.color_domain) / params.jump_options.color_domain;
         let col = this.color_machine(1 - cv).rgba()
         col[3] = params.jump_options.alpha * 255;
         col[3] = 150

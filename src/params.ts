@@ -6,8 +6,8 @@ export var params = {
   },
 
   grid:{
-    cols:8 * 2,
-    rows: 8,
+    cols:18 * 2,
+    rows: 16,
     max_value: 6,
     max_value_inc: 1,
   },
@@ -21,16 +21,15 @@ export var params = {
     inc_max_grid_value_on_trap: true,
     oscillate_smoothing: false,
     oscillate_weave_width: true,
-    oscillate_weave_step: true,
+    oscillate_weave_step: false, // experimental
     toggle_knight_jump: false,
     toggle_knight_corners: true,
-     
   },
 
   knight:{
     jump:{
-      x: 1,
-      y: 1,
+      x: 4,
+      y: 3,
 
       // only toggle knight jump on
       min_x: 1,
@@ -70,7 +69,7 @@ export var params = {
 
     step: {
       low: 1,
-      high: 6,
+      high: 4,
     },
 
     outline: {
@@ -78,17 +77,26 @@ export var params = {
       color: 'black',
     },
 
+    color_domain: 6,
+    // color_mode: 'const'
+    // color_mode: 'step'
+    color_mode: 'horizontal'
+    // color_mode: 'vertical'
   },
 
   jump_options:{
     alpha: 0.05,
     shape: 'circle',
     radius: 0.25,
+    color_domain: 6,
   },
 
   color: {
-    const: false,
-    const_color: 'white',
+    // mode: 'x_dir',
+    // mode: 'y_dir',
+
+    const: true,
+    const_color: 'blue',
     palette: 'hilda02',
     // palette: 'tundra4',
     // palette: 'winter-night',

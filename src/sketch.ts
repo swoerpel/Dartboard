@@ -13,6 +13,7 @@ var sketch = function (p: p5) {
   var color_palettes = {};
 
   // control index values
+  var draw_index = 0;
   var jump_toggle_index = 0;
   var weave_width_index = 0;
   var weave_ratio_index = 0;
@@ -40,6 +41,7 @@ var sketch = function (p: p5) {
     weave.RefreshKnight(weave_corner_index);
     weave.RefreshQueue();
     weave.RefreshGrid();
+    weave_step_oscillate_value = 0;
   }
 
   p.draw = function () {
@@ -53,6 +55,7 @@ var sketch = function (p: p5) {
         modifyJumping();
 
       p.image(graphic, 0, 0)
+      draw_index++;
       jump_toggle_index++;
       weave_ratio_index++;
       weave_width_index++;
@@ -81,23 +84,17 @@ var sketch = function (p: p5) {
 
   function calculateWeaveStep(){
     if(params.draw.oscillate_weave_step){
-      let draw_weave = false;
-      if(weave_step_oscillate_value === 0){
-        draw_weave = true;
+      let draw_weave = true;
+      if(weave_step_oscillate_value > 0){
+        draw_weave = false;
       }
-      weave_step_oscillate_value++;
       if(weave_step_oscillate_toggle){
-        // low value
-        if(weave_step_oscillate_value % params.weave.step.low == 0){
-          weave_step_oscillate_toggle = !weave_step_oscillate_value;
-          weave_step_oscillate_value = 0;
-        }
-      }else {
-        // high value
-        if(weave_step_oscillate_value % params.weave.step.high == 0){
-          weave_step_oscillate_toggle = !weave_step_oscillate_value;
-          weave_step_oscillate_value = 0;
-        }
+        weave_step_oscillate_value = (weave_step_oscillate_value + 1) % params.weave.step.low
+      }else{
+        weave_step_oscillate_value = (weave_step_oscillate_value + 1) % params.weave.step.high
+      }
+      if(draw_index % params.weave.step.high == 0){
+        weave_step_oscillate_toggle = !weave_step_oscillate_value;
       }
       return draw_weave;
     }
