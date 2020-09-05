@@ -1,16 +1,12 @@
 import {params} from './params'
-import { SmoothLine, arrSum } from './helpers';
+import { SmoothLine, arrSum, fractionalBounds } from './helpers';
 import * as chroma from 'chroma.ts';
 import { GridMachine } from './grid_machine';
 import { _GridMachine } from './grid_machine_';
+import { Point } from './models/point.model';
+import { Cell } from './models/cell.model';
 
-export interface Cell{
-    value: number;
-    x:number;
-    y:number;
-    cx:number;
-    cy:number;
-}
+
 
 export class Weave {
     grid: Cell[][] = [];
@@ -23,18 +19,18 @@ export class Weave {
 
     grid_machine: GridMachine;
     _grid_machine: _GridMachine;
-    public knightStartCorners = [
+
+    public knightStartCorners: Point[] = [
         {x:0,y:0},
         {x:0,y:params.grid.rows - 1},
         {x:params.grid.cols - 1,y:params.grid.rows - 1},
         {x:params.grid.cols - 1,y:0}
     ]
 
-
     knight_x: number = this.knightStartCorners[0].x;
     knight_y: number = this.knightStartCorners[0].y;
-    weave_queue: {x:number,y:number}[];
-    knight_jump_offsets: {x:number;y:number}[] = [];
+    weave_queue: Point[];
+    knight_jump_offsets: Point[] = [];
 
     constructor(
         public graphic, 
@@ -69,10 +65,11 @@ export class Weave {
         this.grid = []
         this.cell_count = 0;
         // let value_grid = this._grid_machine.orderedSequenceGrid(params.grid.max_value);
+        let value_grid = this._grid_machine.wolframGrid();
         // let value_grid = this._grid_machine.orderedDomainGrid(params.grid.max_value);
-        let value_grid = this._grid_machine.stripeGrid(params.grid.max_value);
+        // let value_grid = this._grid_machine.stripeGrid(params.grid.max_value);
         for(let i = 0; i < params.grid.cols; i++){
-            let row = [];
+            let row: Cell[] = [];
             for(let j = 0; j < params.grid.rows; j++){
 
                 let value = value_grid[i][j].value;
@@ -93,16 +90,16 @@ export class Weave {
     }
 
 
-
-
-    Jump(weave_step){
+    Jump(weave_step): boolean{
         const options = this.calculateNext()
         if(options.length == 0){
             this.jump_count = 0;
             return false;
         }
-        if(params.draw.jump_options)
-            this.drawOptions(options);
+        if(params.draw.jump_options){
+            if(Math.random() > params.jump_options.draw_probability)
+                this.drawOptions(options);
+        }
         if(params.draw.knight)
             this.drawKnight();
         if(params.draw.weave && weave_step)
@@ -129,7 +126,7 @@ export class Weave {
     }
 
     // called on every draw
-    setWeaveColors(stroke_width_offset = 0){
+    setWeaveColors(){
         let col;
         if(params.weave.color_mode === 'const'){
             col = params.color.const_color
@@ -137,35 +134,41 @@ export class Weave {
         }else if(params.weave.color_mode === 'step'){
             let cv = (this.jump_count % params.weave.color_domain) / params.weave.color_domain;
             col = this.color_machine(cv).rgba()
-        }else if(params.weave.color_mode === 'horizontal'){
-            let cv = this.weave_queue[0].x / params.grid.cols;
-            col = this.color_machine(cv).rgba()
-        }else if(params.weave.color_mode === 'vertical'){
-            let cv = this.weave_queue[0].y / params.grid.rows;
-            col = this.color_machine(cv).rgba()
+        }else {
+            col = this.setColorGradientDirection(params.weave.color_mode)
         }
-
-        // if(!params.color.const){
-        //     let cv = (this.jump_count % params.weave.color_domain) / params.weave.color_domain;
-        //     col = this.color_machine(cv).rgba()
-        // }
-        // else{
-        //     col = params.color.const_color
-        //     col = chroma.color(col).rgba()
-        // }
         col[3] = params.weave.alpha * 255;
-        this.graphic.strokeWeight(params.weave.width.value * this.cell_width + stroke_width_offset);
         this.graphic.stroke(col);
     }
 
     setOptionsColors(){
         this.graphic.strokeWeight(0);
-        // this.graphic.fill(params.weave.stroke_weight);
-        let cv = (this.jump_count % params.jump_options.color_domain) / params.jump_options.color_domain;
-        let col = this.color_machine(1 - cv).rgba()
+        let col;
+        if(params.jump_options.color_mode === 'const'){
+            col = params.color.const_color
+            col = chroma.color(col).rgba()
+        }else if(params.jump_options.color_mode === 'step'){
+            let cv = (this.jump_count % params.jump_options.color_domain) / params.jump_options.color_domain;
+            col = this.color_machine(cv).rgba()
+        }else if(params.jump_options.color_mode === 'horizontal'){
+            col = this.setColorGradientDirection(params.jump_options.color_mode)
+        }
         col[3] = params.jump_options.alpha * 255;
-        col[3] = 150
         this.graphic.fill(col);
+    }
+    
+    setColorGradientDirection(direction){
+        let cvx = this.weave_queue[0].x / params.grid.cols;
+        let cvy = this.weave_queue[0].y / params.grid.rows;
+        if(direction === 'horizontal'){
+            return this.color_machine(cvx).rgba()
+        }else if(direction === 'vertical'){
+            return this.color_machine(cvy).rgba()
+        }else if(direction === 'diagonal_A'){
+            return this.color_machine(Math.sqrt(cvx *cvx + cvy * cvy)).rgba()
+        }else if(direction === 'diagonal_B'){
+            return this.color_machine(Math.sqrt(cvx *cvy + cvx * cvy)).rgba()
+        }
     }
 
     rotateWeaveQueue(){
@@ -222,40 +225,60 @@ export class Weave {
             params.weave.smooth.ratio,   
         );
         if(params.weave.outline.width != 0){
-            this.setWeaveColors(params.weave.outline.width);
+            this.setWeaveColors();
+            const border_stroke_weight = (
+                this.cell_width * (params.weave.width.value + params.weave.outline.width)
+            )
+            this.graphic.strokeWeight(border_stroke_weight);
+
+            // this.graphic.stroke('white');
             this.graphic.stroke(params.weave.outline.color);
             this.graphic.beginShape()
             line.forEach((v)=>this.graphic.vertex(v.x,v.y));
             this.graphic.endShape();
         }
+        const border_stroke_weight = (
+            params.weave.width.value * this.cell_width
+        )
+        this.graphic.strokeWeight(border_stroke_weight);
         this.setWeaveColors();
         this.graphic.beginShape()
         line.forEach((v)=>this.graphic.vertex(v.x,v.y));
         this.graphic.endShape();
     }
 
-    drawOptions(options){
+    drawOptions(options): void{
         this.setOptionsColors();
+
         options.map((op) =>{
-            if(params.jump_options.shape == 'circle'){
-                this.graphic.circle(
-                    this.grid[op.x][op.y].cx, 
-                    this.grid[op.x][op.y].cy, 
-                    this.cell_width * params.jump_options.radius, 
-                )
+            const center = {
+                x: params.jump_options.offset ? this.grid[op.x][op.y].x : this.grid[op.x][op.y].cx,
+                y: params.jump_options.offset ? this.grid[op.x][op.y].y : this.grid[op.x][op.y].cy,
             }
+
+            if(params.jump_options.outline.width !== 0){
+                this.graphic.strokeWeight(this.cell_width * (params.jump_options.outline.width));
+                this.graphic.stroke(params.jump_options.outline.color);
+            }
+
+            let radius = Math.random() * 
+                (params.jump_options.radius.max - params.jump_options.radius.min) + 
+                params.jump_options.radius.min;
+            radius = fractionalBounds(radius, 1, 1 / params.jump_options.radius.roundTo);
+
+            console.log('radius',radius)
+            if(params.jump_options.shape == 'circle'){
+                this.graphic.circle(center.x, center.y, this.cell_width * radius)
+            }
+
             if(params.jump_options.shape == 'rect'){
-                let w = this.cell_width * params.jump_options.radius
-                let h = this.cell_height * params.jump_options.radius
-                this.graphic.rect(
-                    this.grid[op.x][op.y].cx, 
-                    this.grid[op.x][op.y].cy, 
-                    w - w/2,
-                    h - h/2,
-                )
+                let w = this.cell_width * radius
+                let h = this.cell_height * radius
+                this.graphic.rect(center.x, center.y, w - w/2, h - h/2)
             }
         })
     }
+
 
     nextJumpIndex(options){
         let next_jump_index = -1;
@@ -269,8 +292,8 @@ export class Weave {
         return next_jump_index;
     }
 
-    calculateNext(){
-        let options = [];
+    calculateNext(): Point[]{
+        let options: Point[] = [];
         this.knight_jump_offsets.forEach((offset)=>{
             try{
                 const x = this.knight_x + offset.x; 
@@ -286,6 +309,8 @@ export class Weave {
             }
         })
         options = options.filter((o)=>o.value != -1)
+        // if(params.jump_options.offset)
+            // options = options.filter((o)=>o.x !== 1 && o.y !== 1)
         return options
     }
 

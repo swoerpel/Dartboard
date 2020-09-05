@@ -4,9 +4,9 @@ export class GridMachine{
     constructor() {}
 
     generate(index, x, y, grid){
-        return this.modMax(index, x, y,grid)
+        // return this.modMax(index, x, y,grid)
         // return this.random(index, x, y,grid)
-        // return this.randMod(index, x, y,grid)
+        return this.randMod(index, x, y,grid)
     }
 
     modMax(index, x, y, grid){

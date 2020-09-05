@@ -14,6 +14,12 @@ export function arrSum(array){
       0
   );
 }
+export function fractionalBounds(number, numerator, denominator, lower = true): number {
+  var frac = denominator / numerator;
+  return (number * 100 - Math.floor(number) * 100) / 100  > 0.5 ?
+    Math.ceil(frac * number) / frac:
+    (Math.floor(frac * number) + 1) / frac;
+} 
 
 export function SmoothLine(
     line, 

@@ -3,6 +3,7 @@ import * as chroma from 'chroma.ts';
 import * as tome from 'chromotome';
 import {params} from './params'
 import { Weave } from './weave';
+import { Console } from 'console';
 
 var sketch = function (p: p5) {
   // core data
@@ -46,6 +47,7 @@ var sketch = function (p: p5) {
 
   p.draw = function () {
     if(!pause){
+      
       JumpKnight();
       if(params.draw.oscillate_smoothing) 
         osscilateSmoothRatio();

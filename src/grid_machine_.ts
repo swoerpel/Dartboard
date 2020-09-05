@@ -1,4 +1,6 @@
 import { GridCell, Domain } from "./grid_machine.models";
+import { WolframParams } from "./wolfram/models/wolfram_params.model";
+import { Wolfram } from "./wolfram/wolfram";
 // import { Wolfram } from "./wolfram/wolfram";
 // import { WolframParams } from "./wolfram/models/wolfram_params.model";
 
@@ -21,7 +23,6 @@ export class _GridMachine {
             })
         })
     }
-
 
     public randomGrid(){
         return this.generateGrid().map((row) => {
@@ -63,29 +64,29 @@ export class _GridMachine {
         })
     }
 
-    // public wolframGrid(base = 4){
-    //     let wolfram_params: WolframParams = {
-    //         base:base,
-    //         kernel: 'B',
-    //         grid:{
-    //             width: this.cols,
-    //             height: this.rows
-    //         },
-    //         init_row:{
-    //             mode: 'random',
-    //             group_size: 1,
-    //         }
-    //     }
-    //     let wolfram = new Wolfram(wolfram_params)
-    //     wolfram.Initialize()
-    //     const grid = this.generateGrid()
-    //     for(let i = 0; i < this.rows; i++){
-    //         wolfram.generateRow().forEach((value, j) => {
-    //             grid[i][j].value = value / base;
-    //         })
-    //     }
-    //     return grid
-    // }
+    public wolframGrid(base = 4){
+        let wolfram_params: WolframParams = {
+            base:base,
+            kernel: 'B',
+            grid:{
+                width: this.cols,
+                height: this.rows
+            },
+            init_row:{
+                mode: 'center',
+                group_size: 4,
+            }
+        }
+        let wolfram = new Wolfram(wolfram_params)
+        wolfram.Initialize()
+        const grid = this.generateGrid()
+        for(let i = 0; i < this.rows; i++){
+            wolfram.generateRow().forEach((value, j) => {
+                grid[i][j].value = value / base;
+            })
+        }
+        return grid
+    }
 
     private generateGrid(){
         const grid: GridCell[][] = [];
